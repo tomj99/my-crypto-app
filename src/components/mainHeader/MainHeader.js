@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useRef } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -16,7 +15,6 @@ import {
   selectFilteredByUsd,
   selectCoin,
   selectCounter,
-  selectCoinStatus,
   selectAggregatePrice,
 } from "../../redux/selectors";
 import SearchItem from "../searchItem/SearchItem";
@@ -27,7 +25,6 @@ import List from "@mui/material/List";
 import { increment, countReset } from "../../redux/slices/counterSlice";
 import { aggregatePrice } from "../../redux/slices/simplePriceSlice";
 import { fetchCoin } from "../../redux/slices/simplePriceSlice";
-import { fetchChartData } from "../../redux/slices/chart24HourSlice";
 import { filterByUsd } from "../../redux/slices/marketsSlice";
 import { fetchModifiableChartData } from "../../redux/slices/chartModifiableTimeSlice";
 import {
@@ -35,8 +32,8 @@ import {
   convertDateToUnix,
 } from "../timeUtils/timeUtils";
 import ChartModal from "../modal/ChartModal";
-import { Assignment } from "@material-ui/icons";
 
+// styled component section
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -80,13 +77,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function MainHeader() {
+  const dispatch = useDispatch();
+  // selectors
   const coinsAllSelector = useSelector(selectCoinsAll);
   const marketsSelector = useSelector(selectMarketsData);
   const usdPairsSelector = useSelector(selectFilteredByUsd);
   const coinSelector = useSelector(selectCoin);
   const countSelector = useSelector(selectCounter);
   const coinAggregatorSelector = useSelector(selectAggregatePrice);
-  const dispatch = useDispatch();
+  // hooks
   const [coinSymbol, setCoinSymbol] = React.useState("");
   const [coinList, setCoinList] = React.useState([]);
   const [open, setOpen] = React.useState(false);
@@ -97,6 +96,7 @@ export default function MainHeader() {
   const [price, setPrice] = React.useState(0);
   const [priceList, setPriceList] = React.useState([]);
 
+  // useEffects section
   React.useEffect(() => {
     if (coinSymbol !== "") {
       coinsAllSelector.map((result) => {
@@ -120,6 +120,7 @@ export default function MainHeader() {
     }
   }, [coinSelector]);
 
+  // actions on rerender section
   if (priceList.length === countSelector && countSelector !== 0) {
     console.log("count: ", countSelector);
     console.log("priceList: ", priceList);
@@ -127,6 +128,12 @@ export default function MainHeader() {
     clearLists();
   }
 
+  if (marketsSelector !== undefined && usdFilter === false) {
+    dispatch(filterByUsd(filterUsd()));
+    setUsdFilter(true);
+  }
+
+  // dispatched functions section
   function filterUsd() {
     let filteredByUsdPairs = [];
     marketsSelector.map((item) => {
@@ -135,11 +142,6 @@ export default function MainHeader() {
       }
     });
     return filteredByUsdPairs;
-  }
-
-  if (marketsSelector !== undefined && usdFilter === false) {
-    dispatch(filterByUsd(filterUsd()));
-    setUsdFilter(true);
   }
 
   function aggregateMarketPrices() {
@@ -157,16 +159,12 @@ export default function MainHeader() {
     return aggregatePrice;
   }
 
+  // handlers section
   function handleChange(Event) {
     setCoinList([]);
     setCoinSymbol(Event.target.value);
     setAnchorEl(Event.currentTarget);
     setOpen(true);
-  }
-
-  function clearLists() {
-    dispatch(countReset());
-    setPriceList([]);
   }
 
   function handleSearchOnEnter(Event) {
@@ -240,6 +238,12 @@ export default function MainHeader() {
   // this is only called when open is set false
   const handleModalClose = () => setOpenModal(false);
 
+  // misc functions section
+  function clearLists() {
+    dispatch(countReset());
+    setPriceList([]);
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -248,7 +252,7 @@ export default function MainHeader() {
             size="large"
             edge="start"
             color="inherit"
-            aria-label="open drawer"
+            aria-label="open-drawer"
             sx={{ mr: 2 }}
           >
             <MenuRoundedIcon />
@@ -261,8 +265,8 @@ export default function MainHeader() {
           >
             My Crypto App
           </Typography>
-          <Search>
-            <SearchIconWrapper>
+          <Search data-testid="search-bar">
+            <SearchIconWrapper aria-label="search-icon">
               <SearchRoundedIcon />
             </SearchIconWrapper>
             <StyledInputBase
@@ -273,7 +277,12 @@ export default function MainHeader() {
               value={coinSymbol}
             ></StyledInputBase>
           </Search>
-          <Popper open={open} anchorEl={anchorEl} placement="bottom-end">
+          <Popper
+            aria-label="popper"
+            open={open}
+            anchorEl={anchorEl}
+            placement="bottom-end"
+          >
             <Paper>
               <ClickAwayListener onClickAway={handleClickAway}>
                 <List>

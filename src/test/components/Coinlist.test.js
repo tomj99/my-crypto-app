@@ -1,7 +1,7 @@
 import React from "react";
 import CoinList from "../../components/coinlist/CoinList";
 import { screen } from "@testing-library/react";
-import { renderMarketCapSliceTestComponent } from "../testUtil";
+import { renderTestComponent } from "../testUtil";
 
 describe("CoinList", () => {
   const initialState = {
@@ -21,10 +21,7 @@ describe("CoinList", () => {
   const renderCoinList = (args, testState) => {
     const defaultProps = {};
     const props = { ...defaultProps, ...args };
-    return renderMarketCapSliceTestComponent(
-      <CoinList {...props} />,
-      testState
-    );
+    return renderTestComponent(<CoinList {...props} />, testState);
   };
 
   test("renders spinner alt text", () => {

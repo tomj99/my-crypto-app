@@ -1,31 +1,28 @@
 import { screen } from "@testing-library/react";
 import React from "react";
 import HomePage from "../../pages/homePage/HomePage";
-import { renderMarketCapSliceTestComponent } from "../testUtil";
+import { renderTestComponent } from "../testUtil";
 
 describe("HomePage", () => {
   const initialState = {
-    coinsMCap: [],
-    status: "idle",
-    error: null,
+    coinsAll: { coinsAll: [], status: "idle", error: null },
+    markets: { markets: [], status: "idle", error: "none" },
   };
+
   const renderHomePage = (args) => {
     const defaultProps = {};
     const props = { ...defaultProps, ...args };
-    return renderMarketCapSliceTestComponent(
-      <HomePage {...props} />,
-      initialState
-    );
+    return renderTestComponent(<HomePage {...props} />, initialState);
   };
 
-  test("renders header", () => {
+  test("renders header text", () => {
     renderHomePage();
-    expect(screen.queryByText(/my crypto app/i)).toBeInTheDocument();
+    expect(screen.getByText(/my crypto app/i)).toBeInTheDocument();
   });
 
   test("renders title", () => {
     renderHomePage();
-    expect(screen.queryByText(/HomePage/)).toBeInTheDocument();
+    expect(screen.queryByText(/Coins - Top 50 by Volume/)).toBeInTheDocument();
   });
 
   test("renders spinner", () => {
