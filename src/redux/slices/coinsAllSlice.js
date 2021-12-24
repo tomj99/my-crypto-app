@@ -13,14 +13,18 @@ export const fetchAllCoins = createAsyncThunk(
   async () => {
     const res = await axios.get(`/assets`);
     // const res = await axios.get(`https://api.coingecko.com/api/v3/coins/list`);
-    return res.data;
+    return res.data.result;
   }
 );
 
 export const coinsAllSlice = createSlice({
   name: "coinsAll",
   initialState,
-  reducers: {},
+  reducers: {
+    updateAllCoinState: (state, action) => {
+      Object.assign(state, action.payload);
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(fetchAllCoins.pending, (state) => {
@@ -37,5 +41,5 @@ export const coinsAllSlice = createSlice({
   },
 });
 
-// export const { updateCoinState } = coinsAllSlice.actions;
+export const { updateAllCoinState } = coinsAllSlice.actions;
 export default coinsAllSlice.reducer;

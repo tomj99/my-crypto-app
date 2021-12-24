@@ -19,6 +19,9 @@ export const marketsSlice = createSlice({
   name: "markets",
   initialState,
   reducers: {
+    updateMarketsState: (state, action) => {
+      Object.assign(state, action.payload);
+    },
     filterByUsd: (state, action) => {
       state.markets = action.payload;
       //Object.assign(state.markets, action.payload);
@@ -40,5 +43,5 @@ export const marketsSlice = createSlice({
   },
 });
 
-export const { filterByUsd } = marketsSlice.actions;
+export const { filterByUsd, updateMarketsState } = marketsSlice.actions;
 export default marketsSlice.reducer;

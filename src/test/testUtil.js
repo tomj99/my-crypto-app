@@ -7,10 +7,14 @@ import counterReducer from "../redux/slices/counterSlice";
 import chartModifiableTimeReducer from "../redux/slices/chartModifiableTimeSlice";
 import chart24HourReducer from "../redux/slices/chart24HourSlice";
 import simplePriceReducer from "../redux/slices/simplePriceSlice";
-import marketsReducer from "../redux/slices/marketsSlice";
-import coinsAllReducer from "../redux/slices/coinsAllSlice";
+import marketsReducer, {
+  updateMarketsState,
+} from "../redux/slices/marketsSlice";
+import coinsAllReducer, {
+  updateAllCoinState,
+} from "../redux/slices/coinsAllSlice";
 import marketCapReducer, {
-  updateCoinState,
+  updateCoinsMcapState,
 } from "../redux/slices/marketCapSlice";
 
 function renderTestComponent(ui, testState) {
@@ -26,9 +30,20 @@ function renderTestComponent(ui, testState) {
       ohlc: ohlcReducer,
     },
   });
-  // any dispatching of test states can be done here
-  store.dispatch(updateCoinState(testState));
+  // any dispatching of new test states can be done here
+  if (testState !== undefined) {
+    if (testState.coinsAll !== undefined) {
+      store.dispatch(updateAllCoinState(testState.coinsAll));
+    }
+    if (testState.coinsMcap !== undefined) {
+      store.dispatch(updateCoinsMcapState(testState.coinsMcap));
+    }
+    if (testState.markets !== undefined) {
+      store.dispatch(updateMarketsState(testState.markets));
+    }
+  }
 
+  // store.dispatch(updateAllCoinState(testState));
   const wrapper = ({ children }) => {
     return <Provider store={store}>{children}</Provider>;
   };

@@ -22,7 +22,7 @@ export const marketCapSlice = createSlice({
   name: "coinsByMarketCap",
   initialState,
   reducers: {
-    updateCoinState: (state, action) => {
+    updateCoinsMcapState: (state, action) => {
       Object.assign(state, action.payload);
     },
   },
@@ -42,5 +42,5 @@ export const marketCapSlice = createSlice({
   },
 });
 
-export const { updateCoinState } = marketCapSlice.actions;
+export const { updateCoinsMcapState } = marketCapSlice.actions;
 export default marketCapSlice.reducer;

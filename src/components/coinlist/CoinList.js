@@ -15,15 +15,6 @@ const CoinList = () => {
   const coinsMCapErrorMessageSelector = useSelector(selectCoinsMCapError);
   let coinNumber = 1;
 
-  const newState = {
-    coinsMCap: [
-      { id: "bitcoin", name: "Bitcoin", current_price: "100,000" },
-      { id: "ethereum", name: "Ethereum", current_price: "4500" },
-    ],
-    status: "succeeded",
-    error: null,
-  };
-
   if (
     coinsMCapStatusSelector === "loading" ||
     coinsMCapStatusSelector === "idle"

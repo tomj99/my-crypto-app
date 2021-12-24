@@ -10,12 +10,14 @@ describe("CoinList", () => {
     error: null,
   };
   const newState = {
-    coinsMCap: [
-      { id: "ethereum", name: "Ethereum", current_price: "4500" },
-      { id: "bitcoin", name: "BTC", current_price: "100,000" },
-    ],
-    status: "succeeded",
-    error: null,
+    coinsMcap: {
+      coinsMCap: [
+        { id: "ethereum", name: "Ethereum", current_price: "4500" },
+        { id: "bitcoin", name: "BTC", current_price: "100,000" },
+      ],
+      status: "succeeded",
+      error: null,
+    },
   };
 
   const renderCoinList = (args, testState) => {
@@ -25,7 +27,7 @@ describe("CoinList", () => {
   };
 
   test("renders spinner alt text", () => {
-    renderCoinList(null, initialState);
+    renderCoinList();
     expect(screen.getByAltText(/Loading/i)).toBeInTheDocument();
   });
 

@@ -1,5 +1,5 @@
 // coinsAllSlice selectors
-export const selectCoinsAll = (state) => state.coinsAll.coinsAll.result;
+export const selectCoinsAll = (state) => state.coinsAll.coinsAll;
 export const selectCoinsAllStatus = (state) => state.coinsAll.status;
 export const selectCoinsAllError = (state) => state.coinsAll.error;
 

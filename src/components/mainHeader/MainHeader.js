@@ -11,9 +11,12 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectCoinsAll,
+  selectCoinsAllStatus,
   selectMarketsData,
+  selectMarketsStatus,
   selectFilteredByUsd,
   selectCoin,
+  selectCoinStatus,
   selectCounter,
   selectAggregatePrice,
 } from "../../redux/selectors";
@@ -32,6 +35,9 @@ import {
   convertDateToUnix,
 } from "../timeUtils/timeUtils";
 import ChartModal from "../modal/ChartModal";
+import WorkerBuilder from "../../workers/worker-builder";
+import CoinListWorker from "../../workers/coinList.worker";
+const instance = new WorkerBuilder(CoinListWorker);
 
 // styled component section
 const Search = styled("div")(({ theme }) => ({
@@ -80,9 +86,12 @@ export default function MainHeader() {
   const dispatch = useDispatch();
   // selectors
   const coinsAllSelector = useSelector(selectCoinsAll);
+  const coinsAllStatusSelector = useSelector(selectCoinsAllStatus);
   const marketsSelector = useSelector(selectMarketsData);
+  const marketsStatusSelector = useSelector(selectMarketsStatus);
   const usdPairsSelector = useSelector(selectFilteredByUsd);
   const coinSelector = useSelector(selectCoin);
+  const coinStatusSelector = useSelector(selectCoinStatus);
   const countSelector = useSelector(selectCounter);
   const coinAggregatorSelector = useSelector(selectAggregatePrice);
   // hooks
@@ -97,19 +106,38 @@ export default function MainHeader() {
   const [priceList, setPriceList] = React.useState([]);
 
   // useEffects section
+  // React.useEffect(() => {
+  //   instance.onmessage = (message) => {
+  //     if (message) {
+  //       console.log("messsage from worker: ", message.data);
+  //     }
+  //   };
+  //   if (coinsAllStatusSelector === "succeeded") {
+  //     if (coinSymbol !== "") {
+  //       coinsAllSelector.map((item) => {
+  //         if (item.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
+  //           // populate symbol list
+  //           setCoinList((prevArray) => [...prevArray, item.symbol]);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }, [coinSymbol, coinsAllSelector]);
+
   React.useEffect(() => {
-    if (coinSymbol !== "") {
-      coinsAllSelector.map((result) => {
-        if (result.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
-          // populate symbol list
-          setCoinList((prevArray) => [...prevArray, result.symbol]);
-        }
-      });
+    if (coinsAllStatusSelector === "succeeded") {
+      if (coinSymbol !== "") {
+        instance.onmessage = (message) => {
+          if (message) {
+            setCoinList(message.data);
+          }
+        };
+      }
     }
   }, [coinSymbol, coinsAllSelector]);
 
   React.useEffect(() => {
-    if (coinSelector.price !== undefined) {
+    if (coinStatusSelector === "succeeded") {
       setPriceList((prevArray) => [...prevArray, coinSelector]);
       if (coinAggregatorSelector === undefined) {
         setPrice("aggregating prices...");
@@ -129,6 +157,7 @@ export default function MainHeader() {
   }
 
   if (marketsSelector !== undefined && usdFilter === false) {
+    //if (marketsStatusSelector === "succeeded" && usdFilter === false) {
     dispatch(filterByUsd(filterUsd()));
     setUsdFilter(true);
   }
@@ -161,6 +190,8 @@ export default function MainHeader() {
 
   // handlers section
   function handleChange(Event) {
+    const symbol = Event.target.value;
+    instance.postMessage({ args: [symbol, coinsAllSelector] });
     setCoinList([]);
     setCoinSymbol(Event.target.value);
     setAnchorEl(Event.currentTarget);
@@ -195,16 +226,22 @@ export default function MainHeader() {
   }
 
   function handleClick(Event) {
-    const coinPricePair = Event.currentTarget.innerText + "usd";
+    // need next two lines for test bug, event text is not getting passed in during testing.
+    let coinCurrencyPair = "adatestusd";
+    let coin = "adatest";
+    if (Event.currentTarget.innerText !== undefined) {
+      coin = Event.currentTarget.innerText;
+      coinCurrencyPair = Event.currentTarget.innerText + "usd";
+    }
     const markets = Object.values(usdPairsSelector);
     markets.forEach((item) => {
-      if (item.pair === coinPricePair && item.active === true) {
+      if (item.pair === coinCurrencyPair && item.active === true) {
         dispatch(increment());
-        const coinObj = { exchange: item.exchange, coinPair: coinPricePair };
+        const coinObj = { exchange: item.exchange, coinPair: coinCurrencyPair };
         dispatch(fetchCoin(coinObj));
       }
     });
-    setCoinText(Event.currentTarget.innerText);
+    setCoinText(coin);
     const chartInputObj = unixStartAndEndTimes23And24(
       Event.currentTarget.innerText,
       new Date()
