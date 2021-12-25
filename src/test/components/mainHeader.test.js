@@ -1,5 +1,5 @@
 import { jssPreset } from "@material-ui/core";
-import { screen, cleanup } from "@testing-library/react";
+import { screen, cleanup, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import MainHeader from "../../components/mainHeader/MainHeader";
@@ -108,6 +108,7 @@ describe("MainHeader", () => {
       const input = screen.getByPlaceholderText(/Search coin…/);
       // userEvent.click(input);
       userEvent.type(input, "adatest");
+      fireEvent.keyDown(input, { key: "Enter", code: "13" });
       expect(screen.queryByText(/coin: adatest/i)).toBeInTheDocument();
     });
 
