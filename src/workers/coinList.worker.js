@@ -1,14 +1,6 @@
-// import { useSelector } from "react-redux";
-// const coinsAllSelector = useSelector(selectCoinsAll);
+// import coinList from "./coinList";
 
-// coinsAllSelector.map((item) => {
-//   if (item.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
-//     // populate symbol list
-//     setCoinList((prevArray) => [...prevArray, item.symbol]);
-//   }
-// });
-
-export default () => {
+const CoinListWorker = () => {
   onmessage = (message) => {
     let coinSymbol = "";
     let coinSelectorRaw = "";
@@ -25,3 +17,11 @@ export default () => {
     postMessage(coinList);
   };
 };
+
+// const CoinListWorker = () => {
+//   onmessage = (message) => {
+//     postMessage(coinList(message));
+//   };
+// };
+
+export default CoinListWorker;

@@ -105,25 +105,7 @@ export default function MainHeader() {
   const [price, setPrice] = React.useState(0);
   const [priceList, setPriceList] = React.useState([]);
 
-  // useEffects section
-  // React.useEffect(() => {
-  //   instance.onmessage = (message) => {
-  //     if (message) {
-  //       console.log("messsage from worker: ", message.data);
-  //     }
-  //   };
-  //   if (coinsAllStatusSelector === "succeeded") {
-  //     if (coinSymbol !== "") {
-  //       coinsAllSelector.map((item) => {
-  //         if (item.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
-  //           // populate symbol list
-  //           setCoinList((prevArray) => [...prevArray, item.symbol]);
-  //         }
-  //       });
-  //     }
-  //   }
-  // }, [coinSymbol, coinsAllSelector]);
-
+  // SECTION useEffects
   React.useEffect(() => {
     if (coinsAllStatusSelector === "succeeded") {
       if (coinSymbol !== "") {
@@ -134,7 +116,7 @@ export default function MainHeader() {
         };
       }
     }
-  }, [coinSymbol, coinsAllSelector]);
+  }, [coinSymbol, coinsAllStatusSelector]);
 
   React.useEffect(() => {
     if (coinStatusSelector === "succeeded") {
@@ -148,7 +130,7 @@ export default function MainHeader() {
     }
   }, [coinSelector]);
 
-  // actions on rerender section
+  // SECTION actions on rerender
   if (priceList.length === countSelector && countSelector !== 0) {
     console.log("count: ", countSelector);
     console.log("priceList: ", priceList);
@@ -162,7 +144,7 @@ export default function MainHeader() {
     setUsdFilter(true);
   }
 
-  // dispatched functions section
+  // SECTION dispatched functions
   function filterUsd() {
     let filteredByUsdPairs = [];
     marketsSelector.map((item) => {
@@ -188,7 +170,7 @@ export default function MainHeader() {
     return aggregatePrice;
   }
 
-  // handlers section
+  // SECTION handlers
   function handleChange(Event) {
     const symbol = Event.target.value;
     instance.postMessage({ args: [symbol, coinsAllSelector] });
@@ -275,7 +257,7 @@ export default function MainHeader() {
   // this is only called when open is set false
   const handleModalClose = () => setOpenModal(false);
 
-  // misc functions section
+  // SECTION misc functions
   function clearLists() {
     dispatch(countReset());
     setPriceList([]);

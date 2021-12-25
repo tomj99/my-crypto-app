@@ -1,3 +1,4 @@
+import { jssPreset } from "@material-ui/core";
 import { screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
@@ -47,6 +48,8 @@ describe("MainHeader", () => {
     const props = { ...defaultProps };
     return renderTestComponent(<MainHeader {...props} />, testState);
   };
+
+  jest.mock("../../workers/coinList.worker.js");
 
   describe("main header rendering", () => {
     test("renders header text", () => {
