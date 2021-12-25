@@ -1,4 +1,4 @@
-let coinList = (msg) => {
+const coinList = (msg) => {
   let coinSymbol = "";
   let coinSelectorRaw = "";
   let coinList = [];
