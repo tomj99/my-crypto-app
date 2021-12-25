@@ -49,7 +49,7 @@ describe("MainHeader", () => {
     return renderTestComponent(<MainHeader {...props} />, testState);
   };
 
-  jest.mock("../../workers/coinList.worker.js");
+  // jest.mock("../../workers/coinList.worker.js");
 
   describe("main header rendering", () => {
     test("renders header text", () => {

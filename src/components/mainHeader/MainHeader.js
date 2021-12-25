@@ -35,9 +35,9 @@ import {
   convertDateToUnix,
 } from "../timeUtils/timeUtils";
 import ChartModal from "../modal/ChartModal";
-import WorkerBuilder from "../../workers/worker-builder";
-import CoinListWorker from "../../workers/coinList.worker";
-const instance = new WorkerBuilder(CoinListWorker);
+// import WorkerBuilder from "../../workers/worker-builder";
+// import CoinListWorker from "../../workers/coinList.worker";
+// const instance = new WorkerBuilder(CoinListWorker);
 
 // styled component section
 const Search = styled("div")(({ theme }) => ({
@@ -105,31 +105,31 @@ export default function MainHeader() {
   const [price, setPrice] = React.useState(0);
   const [priceList, setPriceList] = React.useState([]);
 
-  // without webworker, tests pass
-  // React.useEffect(() => {
-  //   if (coinSymbol !== "") {
-  //     coinsAllSelector.map((result) => {
-  //       if (result.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
-  //         // populate symbol list
-  //         setCoinList((prevArray) => [...prevArray, result.symbol]);
-  //       }
-  //     });
-  //   }
-  // }, [coinSymbol, coinsAllSelector]);
-
   // SECTION useEffects
-  // with webworker, tests fail
+  // *Without webworker*, tests pass
   React.useEffect(() => {
-    if (coinsAllStatusSelector === "succeeded") {
-      if (coinSymbol !== "") {
-        instance.onmessage = (message) => {
-          if (message) {
-            setCoinList(message.data);
-          }
-        };
-      }
+    if (coinSymbol !== "") {
+      coinsAllSelector.map((result) => {
+        if (result.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
+          // populate symbol list
+          setCoinList((prevArray) => [...prevArray, result.symbol]);
+        }
+      });
     }
-  }, [coinSymbol, coinsAllStatusSelector]);
+  }, [coinSymbol, coinsAllSelector]);
+
+  // *With webworker*, tests fail
+  // React.useEffect(() => {
+  //   if (coinsAllStatusSelector === "succeeded") {
+  //     if (coinSymbol !== "") {
+  //       instance.onmessage = (message) => {
+  //         if (message) {
+  //           setCoinList(message.data);
+  //         }
+  //       };
+  //     }
+  //   }
+  // }, [coinSymbol, coinsAllStatusSelector]);
 
   React.useEffect(() => {
     if (coinStatusSelector === "succeeded") {
@@ -186,7 +186,7 @@ export default function MainHeader() {
   // SECTION handlers
   function handleChange(Event) {
     const symbol = Event.target.value;
-    instance.postMessage({ args: [symbol, coinsAllSelector] });
+    // instance.postMessage({ args: [symbol, coinsAllSelector] });
     setCoinList([]);
     setCoinSymbol(Event.target.value);
     setAnchorEl(Event.currentTarget);
