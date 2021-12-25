@@ -105,7 +105,20 @@ export default function MainHeader() {
   const [price, setPrice] = React.useState(0);
   const [priceList, setPriceList] = React.useState([]);
 
+  // without webworker, tests pass
+  // React.useEffect(() => {
+  //   if (coinSymbol !== "") {
+  //     coinsAllSelector.map((result) => {
+  //       if (result.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
+  //         // populate symbol list
+  //         setCoinList((prevArray) => [...prevArray, result.symbol]);
+  //       }
+  //     });
+  //   }
+  // }, [coinSymbol, coinsAllSelector]);
+
   // SECTION useEffects
+  // with webworker, tests fail
   React.useEffect(() => {
     if (coinsAllStatusSelector === "succeeded") {
       if (coinSymbol !== "") {
