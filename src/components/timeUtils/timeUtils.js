@@ -105,9 +105,5 @@ export function unixStartAndEndTimes23And24(coin, date) {
     startAndEndTimes.endTime = unixTopOfHour;
     startAndEndTimes.startTime = unix23HoursStartTime(unixTopOfHour);
   }
-  console.log("Start Time: ", startAndEndTimes.startTime);
-  console.log("End Time: ", startAndEndTimes.endTime);
-  console.log("Start Date: ", convertUnixToDate(startAndEndTimes.startTime));
-  console.log("End Date: ", convertUnixToDate(startAndEndTimes.endTime));
   return startAndEndTimes;
 }
