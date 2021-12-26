@@ -29,7 +29,6 @@ export const simplePriceSlice = createSlice({
   reducers: {
     aggregatePrice: (state, action) => {
       state.coin.aggregatorPrice = action.payload;
-      console.log(action.payload);
     },
   },
   extraReducers(builder) {

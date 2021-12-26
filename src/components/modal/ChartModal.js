@@ -3,9 +3,16 @@ import Box from "@mui/material/Box";
 import CandleStickChart from "../candlestickChart/CandleStickChart";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchOhlcData } from "../../redux/slices/ohlcSlice";
+import {
+  convertDateToUnix,
+  convertUnixToDate,
+  unixStartAndEndTimes23And24,
+} from "../timeUtils/timeUtils";
 
 const ChartModal = (props) => {
+  const dispatch = useDispatch();
   const style = {
     position: "absolute",
     top: "50%",
@@ -19,6 +26,12 @@ const ChartModal = (props) => {
     px: 4,
     pb: 3,
   };
+
+  React.useEffect(() => {
+    if (props.openModal) {
+      dispatch(fetchOhlcData(props.chartInputObj));
+    }
+  }, [props.openModal]);
 
   return (
     <Modal hideBackdrop open={props.openModal} onClose={props.handleModalClose}>

@@ -1,7 +1,6 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Spinner from "../spinner/Spinner";
-import { updateCoinState } from "../../redux/slices/marketCapSlice";
 import {
   selectCoinsMCap,
   selectCoinsMCapStatus,
@@ -9,7 +8,6 @@ import {
 } from "../../redux/selectors";
 
 const CoinList = () => {
-  const dispatch = useDispatch();
   const coinsMCapSelector = useSelector(selectCoinsMCap);
   const coinsMCapStatusSelector = useSelector(selectCoinsMCapStatus);
   const coinsMCapErrorMessageSelector = useSelector(selectCoinsMCapError);

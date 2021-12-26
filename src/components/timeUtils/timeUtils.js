@@ -59,18 +59,20 @@ export function convertUnixToDate(unixTime) {
 }
 
 export function convertDateToUnix(date) {
-  var unixTimestamp = date.getTime() / 1000;
+  var unixTimestamp = Math.floor(date / 1000);
+  //unixTimestamp = Math.floor(;
+  // unixTimestamp.toFixed(0);
   // console.log("Date in Unix: ", unixTimestamp);
   return unixTimestamp;
 }
 
 function unix24HourStartTime(unixTopOfHour) {
-  unixTopOfHour -= 3600 * 24 * 1000;
+  unixTopOfHour -= 3600 * 24;
   return unixTopOfHour;
 }
 
 function unix23HoursStartTime(unixTopOfHour) {
-  unixTopOfHour -= 3600 * 23 * 1000;
+  unixTopOfHour -= 3600 * 23;
   return unixTopOfHour;
 }
 
@@ -78,7 +80,7 @@ function unixToSubtractToFindTopOfHour(date) {
   let unixToSubtract = 0;
   let minute = date.getMinutes();
   if (minute > 0) {
-    unixToSubtract = minute * 60 * 1000;
+    unixToSubtract = minute * 60;
   }
   return unixToSubtract;
 }
@@ -88,9 +90,7 @@ export function unixStartAndEndTimes23And24(coin, date) {
     coin: coin,
     startTime: null,
     endTime: null,
-    multiplier: 1,
-    timespan: "hour",
-    limit: null,
+    period: 3600,
   };
   let unixTopOfHour;
   startAndEndTimes.endTime = convertDateToUnix(date);
@@ -99,16 +99,15 @@ export function unixStartAndEndTimes23And24(coin, date) {
     // 24 hour
     unixTopOfHour = startAndEndTimes.endTime;
     startAndEndTimes.startTime = unix24HourStartTime(unixTopOfHour);
-    startAndEndTimes.limit = 1440;
   } else {
     // 23 hour
     unixTopOfHour = startAndEndTimes.endTime - unixToSubtract;
+    startAndEndTimes.endTime = unixTopOfHour;
     startAndEndTimes.startTime = unix23HoursStartTime(unixTopOfHour);
-    startAndEndTimes.limit = 1380;
   }
-  // console.log("Start Time: ", startAndEndTimes.startTime);
-  // console.log("End Time: ", startAndEndTimes.endTime);
-  // console.log("Start Date: ", convertUnixToDate(startAndEndTimes.startTime));
-  // console.log("End Time: ", convertUnixToDate(startAndEndTimes.endTime));
+  console.log("Start Time: ", startAndEndTimes.startTime);
+  console.log("End Time: ", startAndEndTimes.endTime);
+  console.log("Start Date: ", convertUnixToDate(startAndEndTimes.startTime));
+  console.log("End Date: ", convertUnixToDate(startAndEndTimes.endTime));
   return startAndEndTimes;
 }

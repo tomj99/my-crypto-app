@@ -27,3 +27,8 @@ export const selectFilteredByUsd = (state) => state.markets.markets;
 
 // counter selector
 export const selectCounter = (state) => state.counter.value;
+
+// ohlc selectors
+export const selectOhlc = (state) => state.ohlc.ohlc;
+export const selectOhlcStatus = (state) => state.ohlc.status;
+export const selectOhlcError = (state) => state.ohlc.error;

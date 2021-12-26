@@ -11,9 +11,9 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectCoinsAll,
-  selectCoinsAllStatus,
+  // selectCoinsAllStatus,
   selectMarketsData,
-  selectMarketsStatus,
+  // selectMarketsStatus,
   selectFilteredByUsd,
   selectCoin,
   selectCoinStatus,
@@ -33,6 +33,7 @@ import { fetchModifiableChartData } from "../../redux/slices/chartModifiableTime
 import {
   unixStartAndEndTimes23And24,
   convertDateToUnix,
+  convertUnixToDate,
 } from "../timeUtils/timeUtils";
 import ChartModal from "../modal/ChartModal";
 // import WorkerBuilder from "../../workers/worker-builder";
@@ -86,9 +87,9 @@ export default function MainHeader() {
   const dispatch = useDispatch();
   // selectors
   const coinsAllSelector = useSelector(selectCoinsAll);
-  const coinsAllStatusSelector = useSelector(selectCoinsAllStatus);
+  // const coinsAllStatusSelector = useSelector(selectCoinsAllStatus);
   const marketsSelector = useSelector(selectMarketsData);
-  const marketsStatusSelector = useSelector(selectMarketsStatus);
+  // const marketsStatusSelector = useSelector(selectMarketsStatus);
   const usdPairsSelector = useSelector(selectFilteredByUsd);
   const coinSelector = useSelector(selectCoin);
   const coinStatusSelector = useSelector(selectCoinStatus);
@@ -104,6 +105,7 @@ export default function MainHeader() {
   const [usdFilter, setUsdFilter] = React.useState(false);
   const [price, setPrice] = React.useState(0);
   const [priceList, setPriceList] = React.useState([]);
+  const [chartInputObject, setChartInputObject] = React.useState([]);
 
   // SECTION useEffects
   // *Without webworker*, tests pass
@@ -114,6 +116,7 @@ export default function MainHeader() {
           // populate symbol list
           setCoinList((prevArray) => [...prevArray, result.symbol]);
         }
+        return null;
       });
     }
   }, [coinSymbol, coinsAllSelector]);
@@ -145,8 +148,6 @@ export default function MainHeader() {
 
   // SECTION actions on rerender
   if (priceList.length === countSelector && countSelector !== 0) {
-    console.log("count: ", countSelector);
-    console.log("priceList: ", priceList);
     dispatch(aggregatePrice(aggregateMarketPrices()));
     clearLists();
   }
@@ -211,7 +212,6 @@ export default function MainHeader() {
           });
           setCoinText(coin);
           const chartInputObj = unixStartAndEndTimes23And24(coin, new Date());
-          dispatch(fetchModifiableChartData(chartInputObj));
           setOpen(false);
           setCoinSymbol("");
           setOpenModal(true);
@@ -237,14 +237,9 @@ export default function MainHeader() {
       }
     });
     setCoinText(coin);
-    const chartInputObj = unixStartAndEndTimes23And24(
-      Event.currentTarget.innerText,
-      new Date()
+    setChartInputObject(
+      unixStartAndEndTimes23And24(coinCurrencyPair, new Date())
     );
-    const startDate = convertDateToUnix(new Date());
-    console.log("date: ", new Date());
-    console.log("unix: ", startDate);
-    // dispatch(fetchModifiableChartData(chartInputObj));
     setOpen(false);
     setAnchorEl(null);
     setCoinSymbol("");
@@ -337,6 +332,7 @@ export default function MainHeader() {
               handleModalClose={handleModalClose}
               coinText={coinText}
               price={price}
+              chartInputObj={chartInputObject}
             />
           </Box>
         </Toolbar>

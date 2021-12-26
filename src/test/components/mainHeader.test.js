@@ -108,7 +108,7 @@ describe("MainHeader", () => {
       const input = screen.getByPlaceholderText(/Search coin…/);
       // userEvent.click(input);
       userEvent.type(input, "adatest");
-      fireEvent.keyDown(input, { key: "Enter", code: "13" });
+      // fireEvent.keyDown(input, { key: "Enter", code: "13" });
       expect(screen.queryByText(/coin: adatest/i)).toBeInTheDocument();
     });
 

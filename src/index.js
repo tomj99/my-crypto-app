@@ -19,7 +19,7 @@ import {
 store.dispatch(fetchAllCoins());
 store.dispatch(fetchCoinsByMarketCap());
 store.dispatch(fetchMarkets());
-store.dispatch(fetchOhlcData());
+// store.dispatch(fetchOhlcData());
 
 // new Date format: "Sat Dec 04 2021 00:00:00"
 
