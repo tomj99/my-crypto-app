@@ -7,14 +7,16 @@ import {
   VictoryTheme,
   VictoryAxis,
 } from "victory";
+import { convertUnixToDate } from "../timeUtils/timeUtils";
 
 const CandleStickChart = () => {
   const ohlcDataSelector = useSelector(selectOhlcData);
   const [ohlcData, setOhlcData] = React.useState([]);
-
+  const [t, setT] = React.useState("");
   React.useEffect(() => {
+    setOhlcData([]);
     if (ohlcDataSelector.length !== 0) {
-      setOhlcData([]);
+      // setOhlcData([]);
       const ohlc = Object.values(ohlcDataSelector);
       ohlc.map((array) => {
         array.map((element) => {
@@ -24,8 +26,9 @@ const CandleStickChart = () => {
             close: null,
             high: null,
             low: null,
+            volume: null,
           };
-          ohlcDataObj.date = element[0];
+          ohlcDataObj.date = convertUnixToDate(element[0]);
           ohlcDataObj.open = element[1];
           ohlcDataObj.close = element[4];
           ohlcDataObj.high = element[2];
@@ -35,16 +38,19 @@ const CandleStickChart = () => {
       });
     }
   }, [ohlcDataSelector]);
-
+  if (ohlcData[0] !== undefined) {
+    console.log(ohlcData[0].date.getHours());
+  }
   return (
     <VictoryChart
       theme={VictoryTheme.grayscale}
       domainPadding={{ x: 10 }}
-      scale={{ x: "time" }}
+      // scale={{ x: "time" }}
+      // scale={{ x: convertUnixToDate(ohlcData.date) }} // figure this time axis out
     >
       <VictoryAxis
-        scale="time"
-        //tickFormat={(t) => `${t}`}
+        // tickFormat={(t) => `${t.getMinutes()}`}
+        // scale="time"
         fixLabelOverlap
         style={{ tickLabels: { padding: 12, fontSize: 14 } }}
       />

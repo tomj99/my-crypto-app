@@ -103,7 +103,7 @@ export default function MainHeader() {
   const [openModal, setOpenModal] = React.useState(false);
   const [coinText, setCoinText] = React.useState("");
   const [usdFilter, setUsdFilter] = React.useState(false);
-  const [price, setPrice] = React.useState(0);
+  const [price, setPrice] = React.useState("");
   const [priceList, setPriceList] = React.useState([]);
   const [chartInputObject, setChartInputObject] = React.useState([]);
 
@@ -198,20 +198,22 @@ export default function MainHeader() {
     if (Event.charCode === 13 && coinSymbol !== "") {
       coinList.map((coin) => {
         if (coin.toLowerCase() === coinSymbol.toLowerCase()) {
-          const coinPricePair = coinSymbol.toLowerCase() + "usd";
+          const coinCurrencyPair = coinSymbol.toLowerCase() + "usd";
           const markets = Object.values(usdPairsSelector);
           markets.forEach((item) => {
-            if (item.pair === coinPricePair && item.active === true) {
+            if (item.pair === coinCurrencyPair && item.active === true) {
               dispatch(increment());
               const coinObj = {
                 exchange: item.exchange,
-                coinPair: coinPricePair,
+                coinPair: coinCurrencyPair,
               };
               dispatch(fetchCoin(coinObj));
             }
           });
           setCoinText(coin);
-          const chartInputObj = unixStartAndEndTimes23And24(coin, new Date());
+          setChartInputObject(
+            unixStartAndEndTimes23And24(coinCurrencyPair, new Date())
+          );
           setOpen(false);
           setCoinSymbol("");
           setOpenModal(true);
