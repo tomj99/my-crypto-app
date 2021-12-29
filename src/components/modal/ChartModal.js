@@ -11,11 +11,12 @@ import {
   convertUnixToDate,
   unixStartAndEndTimes23And24,
 } from "../timeUtils/timeUtils";
-import { selectOhlcData } from "../../redux/selectors";
+import { selectOhlcData, selectOhlcStatus } from "../../redux/selectors";
 
 const ChartModal = (props) => {
   const dispatch = useDispatch();
   const ohlcDataSelector = useSelector(selectOhlcData);
+  const ohlcStatusSelector = useSelector(selectOhlcStatus);
   const style = {
     position: "absolute",
     top: "50%",
@@ -41,7 +42,10 @@ const ChartModal = (props) => {
       <Box sx={{ ...style, width: 450 }}>
         <h3>Coin: {props.coinText}</h3>
         <h3>Price: {props.price}</h3>
-        <CandleStickCanvas data={ohlcDataSelector} />
+        <CandleStickCanvas
+          data={ohlcDataSelector}
+          status={ohlcStatusSelector}
+        />
         <Button onClick={props.handleModalClick1}>Show Full Chart</Button>
         <Button onClick={props.handleModalClick2}>Add to Portfolio</Button>
       </Box>
