@@ -39,7 +39,7 @@ const ChartModal = (props) => {
 
   return (
     <Modal hideBackdrop open={props.openModal} onClose={props.handleModalClose}>
-      <Box sx={{ ...style, width: 450 }}>
+      <Box sx={{ ...style, width: 475 }}>
         <h3>Coin: {props.coinText}</h3>
         <h3>Price: {props.price}</h3>
         <CandleStickCanvas

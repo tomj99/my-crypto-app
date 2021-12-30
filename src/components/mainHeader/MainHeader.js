@@ -210,7 +210,7 @@ export default function MainHeader() {
               dispatch(fetchCoin(coinObj));
             }
           });
-          setCoinText(coin);
+          setCoinText(coin.toUpperCase());
           setChartInputObject(
             unixStartAndEndTimes23And24(coinCurrencyPair, new Date())
           );
@@ -238,10 +238,11 @@ export default function MainHeader() {
         dispatch(fetchCoin(coinObj));
       }
     });
-    setCoinText(coin);
+    setCoinText(coin.toUpperCase());
     setChartInputObject(
       unixStartAndEndTimes23And24(coinCurrencyPair, new Date())
     );
+    console.log("minutes: ", new Date().getMinutes());
     setOpen(false);
     setAnchorEl(null);
     setCoinSymbol("");
