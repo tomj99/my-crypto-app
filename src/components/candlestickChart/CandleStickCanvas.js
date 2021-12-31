@@ -326,7 +326,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     ctx.textAlign = "right";
     ctx.fillText(tick4Number, 40, yStartText);
     // tick 3
@@ -337,7 +337,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     ctx.fillText(tick3Number, 40, yStartText + splitAxis);
     //tick 2
     ctx.beginPath();
@@ -347,7 +347,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     ctx.fillText(tick2Number, 40, yStartText + splitAxis * 2);
     //tick 1
     ctx.beginPath();
@@ -357,7 +357,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     ctx.fillText(tick1Number, 40, yStartText + splitAxis * 3);
 
     // tick 0
@@ -368,7 +368,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     ctx.textAlign = "right";
     ctx.fillText(tick0Number, 40, yStartText + splitAxis * 4);
 
@@ -391,8 +391,6 @@ const CandleStickCanvas = (props) => {
     ctx.lineTo(450, 260);
     ctx.strokeStyle = "white";
     ctx.stroke();
-    ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
 
     // 5 tick marks
     //tick 1
@@ -403,7 +401,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart - 5, yTickStart + 5);
@@ -419,7 +417,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart + split * 5 - 5, yTickStart + 5);
@@ -435,7 +433,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart + split * 11 - 5, yTickStart + 5);
@@ -451,7 +449,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "deeppink";
+    ctx.fillStyle = "aqua";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart + split * 17 - 5, yTickStart + 5);
@@ -468,7 +466,7 @@ const CandleStickCanvas = (props) => {
       ctx.strokeStyle = "white";
       ctx.stroke();
       ctx.font = "12px serif";
-      ctx.fillStyle = "deeppink";
+      ctx.fillStyle = "aqua";
       //rotate text
       ctx.save();
       ctx.translate(xTickStart + split * 23 - 5, yTickStart + 5);
@@ -484,7 +482,7 @@ const CandleStickCanvas = (props) => {
       ctx.strokeStyle = "white";
       ctx.stroke();
       ctx.font = "12px serif";
-      ctx.fillStyle = "deeppink";
+      ctx.fillStyle = "aqua";
       //rotate text
       ctx.save();
       ctx.translate(xTickStart + split * 23 - 5, yTickStart + 5);
