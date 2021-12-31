@@ -30,7 +30,7 @@ import { aggregatePrice } from "../../redux/slices/simplePriceSlice";
 import { fetchCoin } from "../../redux/slices/simplePriceSlice";
 import { filterByUsd } from "../../redux/slices/marketsSlice";
 import {
-  unixStartAndEndTimes23And24,
+  unixStartAndEndTimes,
   unixStartAndEndTimesLastCandle,
   convertDateToUnix,
   convertUnixToDate,
@@ -87,9 +87,7 @@ export default function MainHeader() {
   const dispatch = useDispatch();
   // selectors
   const coinsAllSelector = useSelector(selectCoinsAll);
-  // const coinsAllStatusSelector = useSelector(selectCoinsAllStatus);
   const marketsSelector = useSelector(selectMarketsData);
-  // const marketsStatusSelector = useSelector(selectMarketsStatus);
   const usdPairsSelector = useSelector(selectFilteredByUsd);
   const coinSelector = useSelector(selectCoin);
   const coinStatusSelector = useSelector(selectCoinStatus);
@@ -105,9 +103,7 @@ export default function MainHeader() {
   const [usdFilter, setUsdFilter] = React.useState(false);
   const [price, setPrice] = React.useState("");
   const [priceList, setPriceList] = React.useState([]);
-  const [chartInputObject23h24h, setChartInputObject23h24h] = React.useState(
-    []
-  );
+  const [chartInputObject, setChartInputObject] = React.useState([]);
   const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
     React.useState([]);
   // SECTION useEffects
@@ -216,22 +212,20 @@ export default function MainHeader() {
           });
           const dateNow = new Date();
           setCoinText(coin.toUpperCase());
-          startEndHours = unixStartAndEndTimes23And24(new Date());
-          setChartInputObject23h24h({
+          startEndHours = unixStartAndEndTimes(dateNow);
+          setChartInputObject({
             coin: coinCurrencyPair,
             startTime: startEndHours.startTime,
             endTime: startEndHours.endTime,
             period: 3600,
           });
-          if (startEndHours.hours === 23) {
-            startEndHours = unixStartAndEndTimesLastCandle(dateNow);
-            setChartInputObjectLastCandle({
-              coin: coinCurrencyPair,
-              startTime: startEndHours.startTime,
-              endTime: startEndHours.endTime,
-              period: 60,
-            });
-          }
+          startEndHours = unixStartAndEndTimesLastCandle(dateNow);
+          setChartInputObjectLastCandle({
+            coin: coinCurrencyPair,
+            startTime: startEndHours.startTime,
+            endTime: startEndHours.endTime,
+            period: 60,
+          });
           setOpen(false);
           setCoinSymbol("");
           setOpenModal(true);
@@ -259,22 +253,20 @@ export default function MainHeader() {
     });
     const dateNow = new Date();
     setCoinText(coin.toUpperCase());
-    startEndHours = unixStartAndEndTimes23And24(dateNow);
-    setChartInputObject23h24h({
+    startEndHours = unixStartAndEndTimes(dateNow);
+    setChartInputObject({
       coin: coinCurrencyPair,
       startTime: startEndHours.startTime,
       endTime: startEndHours.endTime,
       period: 3600,
     });
-    if (startEndHours.hours === 23) {
-      startEndHours = unixStartAndEndTimesLastCandle(dateNow);
-      setChartInputObjectLastCandle({
-        coin: coinCurrencyPair,
-        startTime: startEndHours.startTime,
-        endTime: startEndHours.endTime,
-        period: 60,
-      });
-    }
+    startEndHours = unixStartAndEndTimesLastCandle(dateNow);
+    setChartInputObjectLastCandle({
+      coin: coinCurrencyPair,
+      startTime: startEndHours.startTime,
+      endTime: startEndHours.endTime,
+      period: 60,
+    });
     setOpen(false);
     setAnchorEl(null);
     setCoinSymbol("");
@@ -367,7 +359,7 @@ export default function MainHeader() {
               handleModalClose={handleModalClose}
               coinText={coinText}
               price={price}
-              chartInputObj={chartInputObject23h24h}
+              chartInputObj={chartInputObject}
               chartInputObjLastCandle={chartInputObectLastCandle}
             />
           </Box>

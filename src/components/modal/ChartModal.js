@@ -9,7 +9,7 @@ import { fetchOhlcData } from "../../redux/slices/ohlcSlice";
 import {
   convertDateToUnix,
   convertUnixToDate,
-  unixStartAndEndTimes23And24,
+  unixStartAndEndTimes,
 } from "../timeUtils/timeUtils";
 import {
   selectOhlcData,
@@ -52,8 +52,8 @@ const ChartModal = (props) => {
         <h3>Coin: {props.coinText}</h3>
         <h3>Price: {props.price}</h3>
         <CandleStickCanvas
-          data23h24h={ohlcDataSelector}
-          status23h24h={ohlcStatusSelector}
+          data={ohlcDataSelector}
+          status={ohlcStatusSelector}
           datalastcandle={ohlcModifiableDataSelector}
           statuslastcandle={ohlcModifiableStatusSelector}
         />
