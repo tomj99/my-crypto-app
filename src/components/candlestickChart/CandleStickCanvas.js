@@ -4,12 +4,18 @@ import { convertUnixToDate } from "../timeUtils/timeUtils";
 const CandleStickCanvas = (props) => {
   const canvasRef = useRef(null);
   const [dohlcvData, setDohlcvData] = React.useState([]);
+  const [dohlcvLastCandleData, setDohlcvLastCandleData] = React.useState([]);
   const [highLow, setHighLow] = React.useState([]);
+  const [highLowLastCandle, setHighLowLastCandle] = React.useState([]);
+  const [leftWall, setLeftWall] = React.useState(0);
+  const [timePerPixel, setTimePerPixel] = React.useState(0);
+  const [floor, setFloor] = React.useState(0);
+  const [pricePerPixel, setPricePerPixel] = React.useState(0);
 
   React.useEffect(() => {
-    if (props.status === "succeeded") {
+    if (props.status23h24h === "succeeded") {
       setDohlcvData([]);
-      const dohlcv = Object.values(props.data);
+      const dohlcv = Object.values(props.data23h24h);
       dohlcv.map((obj) => {
         obj.map((element) => {
           let dohlcvDataObj = {
@@ -30,15 +36,43 @@ const CandleStickCanvas = (props) => {
         });
       });
     }
-  }, [props.data]);
-  console.log("dohlcv: ", dohlcvData);
+    if (props.statuslastcandle === "succeeded") {
+      setDohlcvLastCandleData([]);
+      const dohlcvLastCandle = Object.values(props.datalastcandle);
+      dohlcvLastCandle.map((obj) => {
+        obj.map((element) => {
+          let dohlcvLastCandleDataObj = {
+            date: null,
+            open: null,
+            close: null,
+            high: null,
+            low: null,
+            volume: null,
+          };
+          dohlcvLastCandleDataObj.date = element[0];
+          dohlcvLastCandleDataObj.open = element[1];
+          dohlcvLastCandleDataObj.high = element[2];
+          dohlcvLastCandleDataObj.low = element[3];
+          dohlcvLastCandleDataObj.close = element[4];
+          dohlcvLastCandleDataObj.volume = element[5];
+          setDohlcvLastCandleData((dohlcvLastCandleData) => [
+            ...dohlcvLastCandleData,
+            dohlcvLastCandleDataObj,
+          ]);
+        });
+      });
+    }
+  }, [props.data23h24h, props.datalastcandle]);
+
   React.useEffect(() => {
     if (dohlcvData.length > 0) {
       setHighLow(highestAndLowestResult(dohlcvData));
+      // candleScaling();
+    }
+    if (dohlcvLastCandleData.length > 0) {
+      setHighLowLastCandle(highestAndLowestResult(dohlcvLastCandleData));
     }
   }, [dohlcvData]);
-
-  console.log("hlr: ", highLow);
 
   const highestAndLowestResult = (data) => {
     let highLowPair = { high: 0, low: 0 };
@@ -61,8 +95,25 @@ const CandleStickCanvas = (props) => {
     const month = (dateConverted.getMonth() + 1).toString();
     const date = dateConverted.getDate().toString();
     const hour = dateConverted.getHours().toString();
-    const minutes = dateConverted.getMinutes().toString();
-    return month + "/" + date + " " + hour + ":" + minutes + "0";
+    let minutes = dateConverted.getMinutes().toString();
+    if (minutes.length === 1) {
+      minutes = minutes + "0";
+    }
+    return month + "/" + date + " " + hour + ":" + minutes;
+  };
+
+  const tickMarkTimeLastCandle = () => {
+    const dateConverted = convertUnixToDate(
+      dohlcvLastCandleData[dohlcvLastCandleData.length - 1].date
+    );
+    const month = (dateConverted.getMonth() + 1).toString();
+    const date = dateConverted.getDate().toString();
+    const hour = dateConverted.getHours().toString();
+    let minutes = dateConverted.getMinutes().toString();
+    if (minutes.length === 1) {
+      minutes = minutes + "0";
+    }
+    return month + "/" + date + " " + hour + ":" + minutes;
   };
 
   function digitFilter(number) {
@@ -84,32 +135,44 @@ const CandleStickCanvas = (props) => {
     return number;
   }
 
-  const ohlcCandle = (ctx, width, index) => {
+  const candleScaling = () => {
     // set up for aligning candle bodies to time/dates on x-axis
     const dateRange = dohlcvData.length;
     const xPixelRange = 380;
-    const leftWall = 60;
-    const timePerPixel = xPixelRange / dateRange;
-    const startX = leftWall - 5 + index * timePerPixel;
-    // set up for open/close bodies corresponding to y-axis pricing
+    setLeftWall(60);
+    setTimePerPixel(xPixelRange / dateRange);
+
     const priceRange = highLow.high - highLow.low;
     const yPixelRange = 230;
-    const floor = 250;
-    const pricePerPixel = priceRange / yPixelRange;
+    setFloor(250);
+    setPricePerPixel(priceRange / yPixelRange);
+  };
+
+  const ohlcCandle = (ctx, width, index) => {
+    // set up for aligning candle bodies to time/dates on x-axis
+    const startX = leftWall - 5 + index * timePerPixel;
+    // set up for open/close bodies corresponding to y-axis pricing
     const offsetOpen = dohlcvData[index].open - highLow.low;
     const pixelsOpen = offsetOpen / pricePerPixel;
     const open = floor - pixelsOpen;
     const offsetClose = dohlcvData[index].close - highLow.low;
     const pixelsClose = offsetClose / pricePerPixel;
     const close = floor - pixelsClose;
-    const height = (open - close) * -1;
+    let height = (open - close) * -1;
     let color = "";
     if (height < 0) {
       color = "#00ff00";
+      if (height > -1) {
+        height = -1;
+      }
     } else if (height > 0) {
       color = "#ff0000";
+      if (height < 1) {
+        height = 1;
+      }
     } else {
       color = "#0000ff";
+      height = 1;
     }
     // draw candle body
     ctx.fillStyle = color;
@@ -155,8 +218,76 @@ const CandleStickCanvas = (props) => {
     ctx.stroke();
   };
 
-  const ohlcCandleLast = () => {};
+  const ohlcCandleLast = (ctx, width) => {
+    const startX = leftWall - 5 + 23 * timePerPixel;
+    const offsetOpen = dohlcvLastCandleData[0].open - highLow.low;
+    const pixelsOpen = offsetOpen / pricePerPixel;
+    const open = floor - pixelsOpen;
+    const offsetClose =
+      dohlcvLastCandleData[dohlcvLastCandleData.length - 1].close - highLow.low;
+    const pixelsClose = offsetClose / pricePerPixel;
+    const close = floor - pixelsClose;
+    let height = (open - close) * -1;
+    let color = "";
+    if (height < 0) {
+      color = "#00ff00";
+      if (height > -1) {
+        height = -1;
+      }
+    } else if (height > 0) {
+      color = "#ff0000";
+      if (height < 1) {
+        height = 1;
+      }
+    } else {
+      color = "#0000ff";
+      height = 1;
+    }
+    // draw candle body
+    ctx.fillStyle = color;
+    ctx.fillRect(startX, open, width, height);
 
+    // setup for high/low wicks corresponding to y-axis pricing
+    const offsetHigh = highLowLastCandle.high - highLow.low;
+    const pixelsHigh = offsetHigh / pricePerPixel;
+    const high = floor - pixelsHigh;
+    const offsetLow = highLowLastCandle.low - highLow.low;
+    const pixelsLow = offsetLow / pricePerPixel;
+    const low = floor - pixelsLow;
+
+    //high
+    ctx.beginPath();
+    ctx.lineWidth = 1.5;
+    if (height < 0) {
+      ctx.moveTo(startX + 5, close);
+      ctx.lineTo(startX + 5, high);
+    } else if (height > 0) {
+      ctx.moveTo(startX + 5, open);
+      ctx.lineTo(startX + 5, high);
+    } else {
+      ctx.moveTo(startX + 5, open);
+      ctx.lineTo(startX + 5, high);
+    }
+    ctx.strokeStyle = color;
+    ctx.stroke();
+    //low
+    ctx.beginPath();
+    ctx.lineWidth = 1.5;
+    if (height < 0) {
+      ctx.moveTo(startX + 5, open);
+      ctx.lineTo(startX + 5, low);
+    } else if (height > 0) {
+      ctx.moveTo(startX + 5, close);
+      ctx.lineTo(startX + 5, low);
+    } else {
+      ctx.moveTo(startX + 5, open);
+      ctx.lineTo(startX + 5, low);
+    }
+    ctx.strokeStyle = color;
+    ctx.stroke();
+  };
+
+  // set up for y-axis length, number of ticks
   const yAxis = (ctx) => {
     const yStart = 20;
     const yStartText = 24;
@@ -195,7 +326,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     ctx.textAlign = "right";
     ctx.fillText(tick4Number, 40, yStartText);
     // tick 3
@@ -206,7 +337,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     ctx.fillText(tick3Number, 40, yStartText + splitAxis);
     //tick 2
     ctx.beginPath();
@@ -216,7 +347,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     ctx.fillText(tick2Number, 40, yStartText + splitAxis * 2);
     //tick 1
     ctx.beginPath();
@@ -226,7 +357,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     ctx.fillText(tick1Number, 40, yStartText + splitAxis * 3);
 
     // tick 0
@@ -237,7 +368,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     ctx.textAlign = "right";
     ctx.fillText(tick0Number, 40, yStartText + splitAxis * 4);
 
@@ -246,6 +377,7 @@ const CandleStickCanvas = (props) => {
     // ctx.fillText(tick0Number, 29, 264);
   };
 
+  // set up for x axis length, number of ticks
   const xAxis = (ctx) => {
     const xLength = 440 - 60;
     const split = xLength / 23;
@@ -260,7 +392,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
 
     // 5 tick marks
     //tick 1
@@ -271,7 +403,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart - 5, yTickStart + 5);
@@ -287,7 +419,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart + split * 5 - 5, yTickStart + 5);
@@ -303,7 +435,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart + split * 11 - 5, yTickStart + 5);
@@ -319,7 +451,7 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = "white";
     ctx.stroke();
     ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
+    ctx.fillStyle = "deeppink";
     //rotate text
     ctx.save();
     ctx.translate(xTickStart + split * 17 - 5, yTickStart + 5);
@@ -328,21 +460,39 @@ const CandleStickCanvas = (props) => {
     ctx.fillText(tickMarkTime(17), 0, 0);
     ctx.restore();
     // tick 5
-    ctx.beginPath();
-    ctx.lineWidth = 0.35;
-    ctx.moveTo(xTickStart + split * 22, yTickStart);
-    ctx.lineTo(xTickStart + split * 22, yTickEnd);
-    ctx.strokeStyle = "white";
-    ctx.stroke();
-    ctx.font = "12px serif";
-    ctx.fillStyle = "aqua";
-    //rotate text
-    ctx.save();
-    ctx.translate(xTickStart + split * 22 - 5, yTickStart + 5);
-    ctx.rotate(Math.PI / 3.5);
-    ctx.textAlign = "left";
-    ctx.fillText(tickMarkTime(22), 0, 0);
-    ctx.restore();
+    if (dohlcvData.length === 24) {
+      ctx.beginPath();
+      ctx.lineWidth = 0.35;
+      ctx.moveTo(xTickStart + split * 23, yTickStart);
+      ctx.lineTo(xTickStart + split * 23, yTickEnd);
+      ctx.strokeStyle = "white";
+      ctx.stroke();
+      ctx.font = "12px serif";
+      ctx.fillStyle = "deeppink";
+      //rotate text
+      ctx.save();
+      ctx.translate(xTickStart + split * 23 - 5, yTickStart + 5);
+      ctx.rotate(Math.PI / 3.5);
+      ctx.textAlign = "left";
+      ctx.fillText(tickMarkTime(23), 0, 0);
+      ctx.restore();
+    } else if (dohlcvData.length === 23) {
+      ctx.beginPath();
+      ctx.lineWidth = 0.35;
+      ctx.moveTo(xTickStart + split * 23, yTickStart);
+      ctx.lineTo(xTickStart + split * 23, yTickEnd);
+      ctx.strokeStyle = "white";
+      ctx.stroke();
+      ctx.font = "12px serif";
+      ctx.fillStyle = "deeppink";
+      //rotate text
+      ctx.save();
+      ctx.translate(xTickStart + split * 23 - 5, yTickStart + 5);
+      ctx.rotate(Math.PI / 3.5);
+      ctx.textAlign = "left";
+      ctx.fillText(tickMarkTimeLastCandle(), 0, 0);
+      ctx.restore();
+    }
   };
 
   const draw = (ctx) => {
@@ -350,41 +500,47 @@ const CandleStickCanvas = (props) => {
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     xAxis(ctx);
     yAxis(ctx);
-    ohlcCandle(ctx, 10, 0);
-    ohlcCandle(ctx, 10, 1);
-    ohlcCandle(ctx, 10, 2);
-    ohlcCandle(ctx, 10, 3);
-    ohlcCandle(ctx, 10, 4);
-    ohlcCandle(ctx, 10, 5);
-    ohlcCandle(ctx, 10, 6);
-    ohlcCandle(ctx, 10, 7);
-    ohlcCandle(ctx, 10, 8);
-    ohlcCandle(ctx, 10, 9);
-    ohlcCandle(ctx, 10, 10);
-    ohlcCandle(ctx, 10, 11);
-    ohlcCandle(ctx, 10, 12);
-    ohlcCandle(ctx, 10, 13);
-    ohlcCandle(ctx, 10, 14);
-    ohlcCandle(ctx, 10, 15);
-    ohlcCandle(ctx, 10, 16);
-    ohlcCandle(ctx, 10, 17);
-    ohlcCandle(ctx, 10, 18);
-    ohlcCandle(ctx, 10, 19);
-    ohlcCandle(ctx, 10, 20);
-    ohlcCandle(ctx, 10, 21);
-    ohlcCandle(ctx, 10, 22);
+    candleScaling();
+    ohlcCandle(ctx, 11, 0);
+    ohlcCandle(ctx, 11, 1);
+    ohlcCandle(ctx, 11, 2);
+    ohlcCandle(ctx, 11, 3);
+    ohlcCandle(ctx, 11, 4);
+    ohlcCandle(ctx, 11, 5);
+    ohlcCandle(ctx, 11, 6);
+    ohlcCandle(ctx, 11, 7);
+    ohlcCandle(ctx, 11, 8);
+    ohlcCandle(ctx, 11, 9);
+    ohlcCandle(ctx, 11, 10);
+    ohlcCandle(ctx, 11, 11);
+    ohlcCandle(ctx, 11, 12);
+    ohlcCandle(ctx, 11, 13);
+    ohlcCandle(ctx, 11, 14);
+    ohlcCandle(ctx, 11, 15);
+    ohlcCandle(ctx, 11, 16);
+    ohlcCandle(ctx, 11, 17);
+    ohlcCandle(ctx, 11, 18);
+    ohlcCandle(ctx, 11, 19);
+    ohlcCandle(ctx, 11, 20);
+    ohlcCandle(ctx, 11, 21);
+    ohlcCandle(ctx, 11, 22);
+    if (dohlcvData.length === 24) {
+      ohlcCandle(ctx, 11, 23);
+    } else {
+      ohlcCandleLast(ctx, 11);
+    }
   };
 
   React.useEffect(() => {
-    if (dohlcvData.length > 0) {
+    if (dohlcvData.length > 0 && dohlcvLastCandleData.length > 0) {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");
       canvas.height = 325;
-      canvas.width = 475;
+      canvas.width = 485;
 
       draw(context);
     }
-  }, [draw, props.status]);
+  }, [draw, props.status23h24h]);
 
   return <canvas ref={canvasRef} {...props} />;
 };

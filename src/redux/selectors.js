@@ -32,3 +32,10 @@ export const selectCounter = (state) => state.counter.value;
 export const selectOhlcData = (state) => state.ohlc.ohlc;
 export const selectOhlcStatus = (state) => state.ohlc.status;
 export const selectOhlcError = (state) => state.ohlc.error;
+
+//ohlcModifiable selectors
+export const selectOhlcModifiableData = (state) =>
+  state.ohlcModifiable.ohlcModifiable;
+export const selectOhlcModifiableStatus = (state) =>
+  state.ohlcModifiable.status;
+export const selectOhlcModifiableError = (state) => state.ohlcModifiable.error;

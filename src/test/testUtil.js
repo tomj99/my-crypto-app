@@ -4,8 +4,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import ohlcReducer from "../redux/slices/ohlcSlice";
 import counterReducer from "../redux/slices/counterSlice";
-import chartModifiableTimeReducer from "../redux/slices/chartModifiableTimeSlice";
-import chart24HourReducer from "../redux/slices/chart24HourSlice";
 import simplePriceReducer from "../redux/slices/simplePriceSlice";
 import marketsReducer, {
   updateMarketsState,
@@ -23,8 +21,6 @@ function renderTestComponent(ui, testState) {
       coinsAll: coinsAllReducer,
       coinsByMarketCap: marketCapReducer,
       coin: simplePriceReducer,
-      chartData: chart24HourReducer,
-      modifiableChartData: chartModifiableTimeReducer,
       markets: marketsReducer,
       counter: counterReducer,
       ohlc: ohlcReducer,

@@ -85,12 +85,13 @@ function unixToSubtractToFindTopOfHour(date) {
   return unixToSubtract;
 }
 
-export function unixStartAndEndTimes23And24(coin, date) {
+export function unixStartAndEndTimes23And24(date) {
   const startAndEndTimes = {
-    coin: coin,
+    // coin: coin,
     startTime: null,
     endTime: null,
-    period: 3600,
+    hours: null,
+    // period: 3600,
   };
   let unixTopOfHour;
   startAndEndTimes.endTime = convertDateToUnix(date);
@@ -99,11 +100,27 @@ export function unixStartAndEndTimes23And24(coin, date) {
     // 24 hour
     unixTopOfHour = startAndEndTimes.endTime;
     startAndEndTimes.startTime = unix24HourStartTime(unixTopOfHour);
+    startAndEndTimes.hours = 24;
   } else {
     // 23 hour
     unixTopOfHour = startAndEndTimes.endTime - unixToSubtract;
     startAndEndTimes.endTime = unixTopOfHour;
     startAndEndTimes.startTime = unix23HoursStartTime(unixTopOfHour);
+    startAndEndTimes.hours = 23;
   }
+  return startAndEndTimes;
+}
+
+export function unixStartAndEndTimesLastCandle(date) {
+  const startAndEndTimes = {
+    // coin: coin,
+    startTime: null,
+    endTime: null,
+    // period: 3600,
+  };
+  startAndEndTimes.endTime = convertDateToUnix(date);
+  let unixToSubtract = unixToSubtractToFindTopOfHour(date);
+  startAndEndTimes.startTime = startAndEndTimes.endTime - unixToSubtract - 60;
+  startAndEndTimes.endTime = convertDateToUnix(date);
   return startAndEndTimes;
 }

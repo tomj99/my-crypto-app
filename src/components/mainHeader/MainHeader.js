@@ -29,9 +29,9 @@ import { increment, countReset } from "../../redux/slices/counterSlice";
 import { aggregatePrice } from "../../redux/slices/simplePriceSlice";
 import { fetchCoin } from "../../redux/slices/simplePriceSlice";
 import { filterByUsd } from "../../redux/slices/marketsSlice";
-import { fetchModifiableChartData } from "../../redux/slices/chartModifiableTimeSlice";
 import {
   unixStartAndEndTimes23And24,
+  unixStartAndEndTimesLastCandle,
   convertDateToUnix,
   convertUnixToDate,
 } from "../timeUtils/timeUtils";
@@ -105,8 +105,11 @@ export default function MainHeader() {
   const [usdFilter, setUsdFilter] = React.useState(false);
   const [price, setPrice] = React.useState("");
   const [priceList, setPriceList] = React.useState([]);
-  const [chartInputObject, setChartInputObject] = React.useState([]);
-
+  const [chartInputObject23h24h, setChartInputObject23h24h] = React.useState(
+    []
+  );
+  const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
+    React.useState([]);
   // SECTION useEffects
   // *Without webworker*, tests pass
   React.useEffect(() => {
@@ -195,6 +198,7 @@ export default function MainHeader() {
   }
 
   function handleSearchOnEnter(Event) {
+    let startEndHours = {};
     if (Event.charCode === 13 && coinSymbol !== "") {
       coinList.map((coin) => {
         if (coin.toLowerCase() === coinSymbol.toLowerCase()) {
@@ -210,10 +214,24 @@ export default function MainHeader() {
               dispatch(fetchCoin(coinObj));
             }
           });
+          const dateNow = new Date();
           setCoinText(coin.toUpperCase());
-          setChartInputObject(
-            unixStartAndEndTimes23And24(coinCurrencyPair, new Date())
-          );
+          startEndHours = unixStartAndEndTimes23And24(new Date());
+          setChartInputObject23h24h({
+            coin: coinCurrencyPair,
+            startTime: startEndHours.startTime,
+            endTime: startEndHours.endTime,
+            period: 3600,
+          });
+          if (startEndHours.hours === 23) {
+            startEndHours = unixStartAndEndTimesLastCandle(dateNow);
+            setChartInputObjectLastCandle({
+              coin: coinCurrencyPair,
+              startTime: startEndHours.startTime,
+              endTime: startEndHours.endTime,
+              period: 60,
+            });
+          }
           setOpen(false);
           setCoinSymbol("");
           setOpenModal(true);
@@ -223,6 +241,7 @@ export default function MainHeader() {
   }
 
   function handleClick(Event) {
+    let startEndHours = {};
     // need next two lines for test bug, event text is not getting passed in during testing.
     let coinCurrencyPair = "adatestusd";
     let coin = "adatest";
@@ -238,11 +257,24 @@ export default function MainHeader() {
         dispatch(fetchCoin(coinObj));
       }
     });
+    const dateNow = new Date();
     setCoinText(coin.toUpperCase());
-    setChartInputObject(
-      unixStartAndEndTimes23And24(coinCurrencyPair, new Date())
-    );
-    console.log("minutes: ", new Date().getMinutes());
+    startEndHours = unixStartAndEndTimes23And24(dateNow);
+    setChartInputObject23h24h({
+      coin: coinCurrencyPair,
+      startTime: startEndHours.startTime,
+      endTime: startEndHours.endTime,
+      period: 3600,
+    });
+    if (startEndHours.hours === 23) {
+      startEndHours = unixStartAndEndTimesLastCandle(dateNow);
+      setChartInputObjectLastCandle({
+        coin: coinCurrencyPair,
+        startTime: startEndHours.startTime,
+        endTime: startEndHours.endTime,
+        period: 60,
+      });
+    }
     setOpen(false);
     setAnchorEl(null);
     setCoinSymbol("");
@@ -335,7 +367,8 @@ export default function MainHeader() {
               handleModalClose={handleModalClose}
               coinText={coinText}
               price={price}
-              chartInputObj={chartInputObject}
+              chartInputObj={chartInputObject23h24h}
+              chartInputObjLastCandle={chartInputObectLastCandle}
             />
           </Box>
         </Toolbar>
