@@ -10,14 +10,14 @@ const CandleStickCanvas = (props) => {
   const [highestLastCandlePrice, setHighestLastCandlePrice] = React.useState(0);
   const [lowestLastCandlePrice, setLowestLastCandlePrice] = React.useState(0);
   const [highestVolume, setHighestVolume] = React.useState(0);
-  const [lowestVolume, setLowestVolume] = React.useState(0);
   const [highestLastCandleVolume, setHighestLastCandleVolume] =
     React.useState(0);
-  const [lowestLastCandleVolume, setLowestLastCandleVolume] = React.useState(0);
   const [leftWall, setLeftWall] = React.useState(0);
   const [timePerPixel, setTimePerPixel] = React.useState(0);
   const [floor, setFloor] = React.useState(0);
   const [pricePerPixel, setPricePerPixel] = React.useState(0);
+  const [volumeFloor, setVolumeFloor] = React.useState(0);
+  const [volumePerPixel, setVolumePerPixel] = React.useState(0);
 
   React.useEffect(() => {
     if (props.status === "succeeded") {
@@ -72,19 +72,21 @@ const CandleStickCanvas = (props) => {
   }, [props.data, props.datalastcandle]);
 
   React.useEffect(() => {
-    let hlp = [];
-    let hlplc = [];
-    if (dohlcvData.length > 0) {
+    if (dohlcvData.length > 0 && dohlcvLastCandleData.length > 0) {
+      let hlp = [];
+      let hv = 0;
       hlp = highestAndLowestPriceResult(dohlcvData);
+      hv = highestVolumeResult(dohlcvData);
       setHighestPrice(hlp.high);
       setLowestPrice(hlp.low);
+      setHighestVolume(hv.high);
+      hlp = highestAndLowestPriceResult(dohlcvLastCandleData);
+      hv = highestVolumeResult(dohlcvLastCandleData);
+      setHighestLastCandlePrice(hlp.high);
+      setLowestLastCandlePrice(hlp.low);
+      setHighestLastCandleVolume(hv.high);
     }
-    if (dohlcvLastCandleData.length > 0) {
-      hlplc = highestAndLowestPriceResult(dohlcvLastCandleData);
-      setHighestLastCandlePrice(hlplc.high);
-      setLowestLastCandlePrice(hlplc.low);
-    }
-  }, [dohlcvData, dohlcvLastCandleData]);
+  }, [dohlcvData]);
 
   const highestAndLowestPriceResult = (data) => {
     let highLowPair = { high: 0, low: 0 };
@@ -102,20 +104,14 @@ const CandleStickCanvas = (props) => {
     return highLowPair;
   };
 
-  const highestAndLowestVolumeResult = (data) => {
-    let highLowPair = { high: 0, low: 0 };
+  const highestVolumeResult = (data) => {
+    let highestVolume = 0;
     data.map((obj) => {
-      if (obj.high > highLowPair.high) {
-        highLowPair.high = obj.high;
-      }
-      if (highLowPair.low === 0) {
-        highLowPair.low = obj.low;
-      }
-      if (obj.low < highLowPair.low) {
-        highLowPair.low = obj.low;
+      if (obj.volume > highestVolume) {
+        highestVolume = obj.volume;
       }
     });
-    return highLowPair;
+    return highestVolume;
   };
 
   const tickMarkTime = (index) => {
@@ -164,17 +160,9 @@ const CandleStickCanvas = (props) => {
     return number;
   }
 
-  const lastCandleRescale = () => {
-    if (highestLastCandlePrice > highestPrice) {
-      setHighestPrice(highestLastCandlePrice);
-    }
-    if (lowestLastCandlePrice < lowestPrice) {
-      setLowestPrice(lowestLastCandlePrice);
-    }
-  };
-
   const candleScaling = () => {
     // set up for aligning candle bodies to time/dates on x-axis
+    // this works for the volume as well
     const dateRange = dohlcvData.length;
     const xPixelRange = 380;
     setLeftWall(60);
@@ -184,6 +172,21 @@ const CandleStickCanvas = (props) => {
     const yPixelRange = 200;
     setFloor(220);
     setPricePerPixel(priceRange / yPixelRange);
+  };
+
+  const lastCandleRescale = () => {};
+
+  const volumeScaling = () => {
+    const volumeRange = highestVolume;
+    const yPixelRange = 60;
+    setVolumeFloor(260);
+    setVolumePerPixel(volumeRange / yPixelRange);
+  };
+
+  const lastVolumeRescale = () => {
+    if (highestLastCandleVolume > highestVolume) {
+      setHighestVolume(highestLastCandleVolume);
+    }
   };
 
   const ohlcCandle = (ctx, width, index) => {
@@ -224,7 +227,7 @@ const CandleStickCanvas = (props) => {
     const pixelsLow = offsetLow / pricePerPixel;
     const low = floor - pixelsLow;
 
-    //high
+    // high
     ctx.beginPath();
     ctx.lineWidth = 1.5;
     if (height < 0) {
@@ -324,6 +327,22 @@ const CandleStickCanvas = (props) => {
     ctx.strokeStyle = color;
     ctx.stroke();
   };
+
+  const ohlcVolume = (ctx, width, index) => {
+    // set up for aligning candle bodies to time/dates on x-axis
+    const startX = leftWall - 5 + index * timePerPixel;
+    // set up for open/close bodies corresponding to y-axis units
+    const offsetTop = dohlcvData[index].volume;
+    const pixelsVolume = offsetTop / volumePerPixel;
+    const volTop = floor - pixelsVolume;
+    const close = floor;
+    let height = offsetTop - floor;
+    // draw candle body
+    ctx.fillStyle = "lightgray";
+    ctx.fillRect(startX, volTop, width, height);
+  };
+
+  const ohlcVolumeLast = () => {};
 
   // set up for y-axis length, number of ticks
   const yAxis = (ctx) => {
@@ -515,10 +534,8 @@ const CandleStickCanvas = (props) => {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     xAxis(ctx);
-    if (dohlcvData.length > 0 && dohlcvLastCandleData.length > 0) {
-      lastCandleRescale();
-      candleScaling();
-    }
+    lastCandleRescale();
+    candleScaling();
     yAxis(ctx);
     ohlcCandle(ctx, 11, 0);
     ohlcCandle(ctx, 11, 1);
@@ -544,6 +561,17 @@ const CandleStickCanvas = (props) => {
     ohlcCandle(ctx, 11, 21);
     ohlcCandle(ctx, 11, 22);
     ohlcCandleLast(ctx, 11);
+    volumeScaling();
+    ohlcVolume(ctx, 11, 0);
+    ohlcVolume(ctx, 11, 1);
+    ohlcVolume(ctx, 11, 2);
+    ohlcVolume(ctx, 11, 3);
+    ohlcVolume(ctx, 11, 4);
+    ohlcVolume(ctx, 11, 5);
+    ohlcVolume(ctx, 11, 6);
+    ohlcVolume(ctx, 11, 7);
+    ohlcVolume(ctx, 11, 8);
+    ohlcVolume(ctx, 11, 9);
   };
 
   React.useEffect(() => {
