@@ -50,7 +50,10 @@ export function unixStartAndEndTimesLastCandle(date) {
   };
   startAndEndTimes.endTime = convertDateToUnix(date);
   let unixToSubtract = unixToSubtractToFindTopOfHour(date);
-  startAndEndTimes.startTime = startAndEndTimes.endTime - unixToSubtract - 60;
-  startAndEndTimes.endTime = convertDateToUnix(date);
+  if (unixToSubtract === 0) {
+    unixToSubtract = 3600;
+  }
+  startAndEndTimes.startTime = startAndEndTimes.endTime - unixToSubtract;
+  // startAndEndTimes.endTime = convertDateToUnix(date);
   return startAndEndTimes;
 }

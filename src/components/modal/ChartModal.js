@@ -1,16 +1,10 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import CandleStickChart from "../candlestickChart/CandleStickChart";
 import CandleStickCanvas from "../candlestickChart/CandleStickCanvas";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchOhlcData } from "../../redux/slices/ohlcSlice";
-import {
-  convertDateToUnix,
-  convertUnixToDate,
-  unixStartAndEndTimes,
-} from "../timeUtils/timeUtils";
 import {
   selectOhlcData,
   selectOhlcStatus,
@@ -49,8 +43,9 @@ const ChartModal = (props) => {
   return (
     <Modal hideBackdrop open={props.openModal} onClose={props.handleModalClose}>
       <Box sx={{ ...style, width: 485 }}>
-        <h3>Coin: {props.coinText}</h3>
-        <h3>Price: {props.price}</h3>
+        <h3>
+          {props.coinText}: {props.price}
+        </h3>
         <CandleStickCanvas
           data={ohlcDataSelector}
           status={ohlcStatusSelector}

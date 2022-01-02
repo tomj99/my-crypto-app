@@ -186,7 +186,7 @@ export default function MainHeader() {
   // SECTION handlers
   function handleChange(Event) {
     const symbol = Event.target.value;
-    // instance.postMessage({ args: [symbol, coinsAllSelector] });
+    // instance.postMessage({ args: [symbol, coinsAllSelector] }); //for webworker
     setCoinList([]);
     setCoinSymbol(Event.target.value);
     setAnchorEl(Event.currentTarget);
@@ -210,6 +210,7 @@ export default function MainHeader() {
               dispatch(fetchCoin(coinObj));
             }
           });
+          // "Sat Jan 01 2022 16:10:18 GMT-0800 (Pacific Standard Time)"
           const dateNow = new Date();
           setCoinText(coin.toUpperCase());
           startEndHours = unixStartAndEndTimes(dateNow);

@@ -12,7 +12,7 @@ export const fetchOhlcModifiableData = createAsyncThunk(
   async (chartInputModObj) => {
     const { coin, startTime, endTime, period } = chartInputModObj;
     const res = await axios.get(
-      `/markets/bitfinex/${coin}/ohlc?before=${endTime}&after=${startTime}&periods=${period}`
+      `/markets/kraken/${coin}/ohlc?before=${endTime}&after=${startTime}&periods=${period}`
     );
     return res.data.result;
   }
