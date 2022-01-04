@@ -3,6 +3,7 @@ import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
+import { Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
@@ -32,10 +33,9 @@ import { filterByUsd } from "../../redux/slices/marketsSlice";
 import {
   unixStartAndEndTimes,
   unixStartAndEndTimesLastCandle,
-  convertDateToUnix,
-  convertUnixToDate,
 } from "../timeUtils/timeUtils";
 import ChartModal from "../modal/ChartModal";
+import { ArrowDropDownCircleSharp } from "@material-ui/icons";
 // import WorkerBuilder from "../../workers/worker-builder";
 // import CoinListWorker from "../../workers/coinList.worker";
 // const instance = new WorkerBuilder(CoinListWorker);
@@ -106,16 +106,18 @@ export default function MainHeader() {
   const [chartInputObject, setChartInputObject] = React.useState([]);
   const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
     React.useState([]);
+  const [isExchanges, setIsExchanges] = React.useState(false);
   // SECTION useEffects
   // *Without webworker*, tests pass
+
+  // Called when search bar is being populated
   React.useEffect(() => {
     if (coinSymbol !== "") {
-      coinsAllSelector.map((result) => {
+      coinsAllSelector.forEach((result) => {
         if (result.symbol.toLowerCase().startsWith(coinSymbol.toLowerCase())) {
           // populate symbol list
           setCoinList((prevArray) => [...prevArray, result.symbol]);
         }
-        return null;
       });
     }
   }, [coinSymbol, coinsAllSelector]);
@@ -143,7 +145,7 @@ export default function MainHeader() {
         setPrice(coinAggregatorSelector);
       }
     }
-  }, [coinSelector]);
+  }, [coinSelector, coinAggregatorSelector, coinStatusSelector]);
 
   // SECTION actions on rerender
   if (priceList.length === countSelector && countSelector !== 0) {
@@ -160,7 +162,7 @@ export default function MainHeader() {
   // SECTION dispatched functions
   function filterUsd() {
     let filteredByUsdPairs = [];
-    marketsSelector.map((item) => {
+    marketsSelector.forEach((item) => {
       if (item.pair.endsWith("usd")) {
         filteredByUsdPairs.push(item);
       }
@@ -185,8 +187,8 @@ export default function MainHeader() {
 
   // SECTION handlers
   function handleChange(Event) {
-    const symbol = Event.target.value;
-    // instance.postMessage({ args: [symbol, coinsAllSelector] }); //for webworker
+    // const symbol = Event.target.value; // for webworker
+    // instance.postMessage({ args: [symbol, coinsAllSelector] }); // for webworker
     setCoinList([]);
     setCoinSymbol(Event.target.value);
     setAnchorEl(Event.currentTarget);
@@ -195,8 +197,9 @@ export default function MainHeader() {
 
   function handleSearchOnEnter(Event) {
     let startEndHours = {};
+    let exchange = "";
     if (Event.charCode === 13 && coinSymbol !== "") {
-      coinList.map((coin) => {
+      coinList.forEach((coin) => {
         if (coin.toLowerCase() === coinSymbol.toLowerCase()) {
           const coinCurrencyPair = coinSymbol.toLowerCase() + "usd";
           const markets = Object.values(usdPairsSelector);
@@ -207,6 +210,12 @@ export default function MainHeader() {
                 exchange: item.exchange,
                 coinPair: coinCurrencyPair,
               };
+              if (
+                item.exchange === "coinbase-pro" ||
+                item.exchange === "kraken"
+              ) {
+                exchange = item.exchange;
+              }
               dispatch(fetchCoin(coinObj));
             }
           });
@@ -219,6 +228,7 @@ export default function MainHeader() {
             startTime: startEndHours.startTime,
             endTime: startEndHours.endTime,
             period: 3600,
+            exchange: exchange,
           });
           startEndHours = unixStartAndEndTimesLastCandle(dateNow);
           setChartInputObjectLastCandle({
@@ -226,8 +236,10 @@ export default function MainHeader() {
             startTime: startEndHours.startTime,
             endTime: startEndHours.endTime,
             period: 60,
+            exchange: exchange,
           });
           setOpen(false);
+          setAnchorEl(null);
           setCoinSymbol("");
           setOpenModal(true);
         }
@@ -236,7 +248,9 @@ export default function MainHeader() {
   }
 
   function handleClick(Event) {
+    setIsExchanges(true);
     let startEndHours = {};
+    let exchange = "";
     // need next two lines for test bug, event text is not getting passed in during testing.
     let coinCurrencyPair = "adatestusd";
     let coin = "adatest";
@@ -249,6 +263,9 @@ export default function MainHeader() {
       if (item.pair === coinCurrencyPair && item.active === true) {
         dispatch(increment());
         const coinObj = { exchange: item.exchange, coinPair: coinCurrencyPair };
+        if (item.exchange === "coinbase-pro" || item.exchange === "kraken") {
+          exchange = item.exchange;
+        }
         dispatch(fetchCoin(coinObj));
       }
     });
@@ -260,6 +277,7 @@ export default function MainHeader() {
       startTime: startEndHours.startTime,
       endTime: startEndHours.endTime,
       period: 3600,
+      exchange: exchange,
     });
     startEndHours = unixStartAndEndTimesLastCandle(dateNow);
     setChartInputObjectLastCandle({
@@ -267,6 +285,7 @@ export default function MainHeader() {
       startTime: startEndHours.startTime,
       endTime: startEndHours.endTime,
       period: 60,
+      exchange: exchange,
     });
     setOpen(false);
     setAnchorEl(null);
@@ -281,11 +300,13 @@ export default function MainHeader() {
   }
 
   const handleModalClick1 = () => {
+    setIsExchanges(false);
     setOpenModal(false);
     clearLists();
   };
 
   const handleModalClick2 = () => {
+    setIsExchanges(false);
     setOpenModal(false);
     clearLists();
   };
@@ -298,6 +319,18 @@ export default function MainHeader() {
     dispatch(countReset());
     setPriceList([]);
   }
+
+  const ExchangeButton = (props) => {
+    const isExchanges = props.isExchanges;
+    if (isExchanges) {
+      return (
+        <Button variant="contained" endIcon={<ArrowDropDownCircleSharp />}>
+          Choose Exchange
+        </Button>
+      );
+    }
+    return null;
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -320,7 +353,8 @@ export default function MainHeader() {
           >
             My Crypto App
           </Typography>
-          <Search data-testid="search-bar">
+          <ExchangeButton isExchanges={isExchanges} />
+          <Search hidden={isExchanges} data-testid="search-bar">
             <SearchIconWrapper aria-label="search-icon">
               <SearchRoundedIcon />
             </SearchIconWrapper>
@@ -332,6 +366,7 @@ export default function MainHeader() {
               value={coinSymbol}
             ></StyledInputBase>
           </Search>
+
           <Popper
             aria-label="popper"
             open={open}

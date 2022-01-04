@@ -38,7 +38,12 @@ const ChartModal = (props) => {
       dispatch(fetchOhlcData(props.chartInputObj));
       dispatch(fetchOhlcModifiableData(props.chartInputObjLastCandle));
     }
-  }, [props.openModal]);
+  }, [
+    props.openModal,
+    dispatch,
+    props.chartInputObj,
+    props.chartInputObjLastCandle,
+  ]);
 
   return (
     <Modal hideBackdrop open={props.openModal} onClose={props.handleModalClose}>

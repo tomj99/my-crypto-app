@@ -1,6 +1,5 @@
 import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { baseUrlCoinGecko } from "../../app/api/api";
 const initialState = {
   coin: [
     {
@@ -15,10 +14,7 @@ export const fetchCoin = createAsyncThunk(
   "coin/fetchCoin",
   async (priceObj) => {
     const { exchange, coinPair } = priceObj;
-    const res = await axios.get(
-      `/markets/${exchange}/${coinPair}/price`
-      //baseUrlCoinGecko + `simple/price?ids=${coinId}&vs_currencies=usd`
-    );
+    const res = await axios.get(`/markets/${exchange}/${coinPair}/price`);
     return res.data.result;
   }
 );

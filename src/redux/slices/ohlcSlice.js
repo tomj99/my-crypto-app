@@ -10,9 +10,9 @@ const initialState = {
 export const fetchOhlcData = createAsyncThunk(
   "ohlc/fetchOhlcData",
   async (chartInputObj) => {
-    const { coin, startTime, endTime, period } = chartInputObj;
+    const { coin, startTime, endTime, period, exchange } = chartInputObj;
     const res = await axios.get(
-      `/markets/kraken/${coin}/ohlc?before=${endTime}&after=${startTime}&periods=${period}`
+      `/markets/${exchange}/${coin}/ohlc?before=${endTime}&after=${startTime}&periods=${period}`
     );
     return res.data.result;
   }

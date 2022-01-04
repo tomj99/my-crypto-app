@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { convertUnixToDate } from "../timeUtils/timeUtils";
 // props.data format [{date: null, open: null, close: null, high: null, low: null, volume: null}]
 const CandleStickCanvas = (props) => {
+  const { data, status, datalastcandle, statuslastcandle } = props;
   const canvasRef = useRef(null);
   const [dohlcvData, setDohlcvData] = React.useState([]);
   const [dohlcvLastCandleData, setDohlcvLastCandleData] = React.useState([]);
@@ -20,11 +21,11 @@ const CandleStickCanvas = (props) => {
   const [volumePerPixel, setVolumePerPixel] = React.useState(0);
 
   React.useEffect(() => {
-    if (props.status === "succeeded") {
+    if (status === "succeeded") {
       setDohlcvData([]);
-      const dohlcv = Object.values(props.data);
-      dohlcv.map((obj) => {
-        obj.map((element) => {
+      const dohlcv = Object.values(data);
+      dohlcv.forEach((obj) => {
+        obj.forEach((element) => {
           let dohlcvDataObj = {
             date: null,
             open: null,
@@ -43,11 +44,11 @@ const CandleStickCanvas = (props) => {
         });
       });
     }
-    if (props.statuslastcandle === "succeeded") {
+    if (statuslastcandle === "succeeded") {
       setDohlcvLastCandleData([]);
-      const dohlcvLastCandle = Object.values(props.datalastcandle);
-      dohlcvLastCandle.map((obj) => {
-        obj.map((element) => {
+      const dohlcvLastCandle = Object.values(datalastcandle);
+      dohlcvLastCandle.forEach((obj) => {
+        obj.forEach((element) => {
           let dohlcvLastCandleDataObj = {
             date: null,
             open: null,
@@ -69,7 +70,7 @@ const CandleStickCanvas = (props) => {
         });
       });
     }
-  }, [props.data, props.datalastcandle]);
+  }, [data, datalastcandle, status, statuslastcandle]);
 
   React.useEffect(() => {
     if (dohlcvData.length > 0 && dohlcvLastCandleData.length > 0) {
@@ -86,11 +87,12 @@ const CandleStickCanvas = (props) => {
       setLowestLastCandlePrice(hlp.low);
       setHighestLastCandleVolume(hv);
     }
-  }, [dohlcvData]);
+  }, [dohlcvData, dohlcvLastCandleData]);
 
+  // try sorting low to high and grabbing last result for fun
   const highestAndLowestPriceResult = (data) => {
     let highLowPair = { high: 0, low: 0 };
-    data.map((obj) => {
+    data.forEach((obj) => {
       if (obj.high > highLowPair.high) {
         highLowPair.high = obj.high;
       }
@@ -104,9 +106,10 @@ const CandleStickCanvas = (props) => {
     return highLowPair;
   };
 
+  // try sorting low to high and grabbing last result for fun
   const highestVolumeResult = (data) => {
     let highestVolume = 0;
-    data.map((obj) => {
+    data.forEach((obj) => {
       if (obj.volume > highestVolume) {
         highestVolume = obj.volume;
       }
@@ -346,7 +349,6 @@ const CandleStickCanvas = (props) => {
     const offsetTop = dohlcvData[index].volume;
     const pixelsTop = offsetTop / volumePerPixel;
     const volTop = volumeFloor - pixelsTop;
-    const close = volumeFloor;
     let height = volumeFloor - volTop;
     // draw candle body
     ctx.fillStyle = "aqua";
@@ -357,13 +359,12 @@ const CandleStickCanvas = (props) => {
     // set up for aligning candle bodies to time/dates on x-axis
     const startX = leftWall - 5 + 23 * timePerPixel;
     let totalVolume = 0;
-    dohlcvLastCandleData.map((element) => {
+    dohlcvLastCandleData.forEach((element) => {
       totalVolume += element.volume;
     });
     const offsetTop = totalVolume;
     const pixelsTop = offsetTop / volumePerPixel;
     const volTop = volumeFloor - pixelsTop;
-    const close = volumeFloor;
     let height = volumeFloor - volTop;
     // draw candle body
     ctx.fillStyle = "aqua";
@@ -560,6 +561,7 @@ const CandleStickCanvas = (props) => {
     xAxis(ctx);
     yAxis(ctx);
     lastCandleRescale(); // not working
+    lastVolumeRescale(); // not working
     candleScaling();
     volumeScaling();
     for (let i = 0; i < dohlcvData.length; i++) {
@@ -579,9 +581,13 @@ const CandleStickCanvas = (props) => {
 
       draw(context);
     }
-  }, [draw, props.status]);
+  });
 
   return <canvas ref={canvasRef} {...props} />;
 };
+
+// React.useEffect(() => {
+//     createGraphics();
+//   }, [createGraphics]);
 
 export default CandleStickCanvas;
