@@ -3,7 +3,6 @@ import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import { Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
@@ -20,6 +19,7 @@ import {
   selectCoinStatus,
   selectCounter,
   selectAggregatePrice,
+  selectMarketsStatus,
 } from "../../redux/selectors";
 import SearchItem from "../searchItem/SearchItem";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -35,7 +35,7 @@ import {
   unixStartAndEndTimesLastCandle,
 } from "../timeUtils/timeUtils";
 import ChartModal from "../modal/ChartModal";
-import { ArrowDropDownCircleSharp } from "@material-ui/icons";
+import ExchangeMenu from "../exchangeMenu/ExchangeMenu";
 // import WorkerBuilder from "../../workers/worker-builder";
 // import CoinListWorker from "../../workers/coinList.worker";
 // const instance = new WorkerBuilder(CoinListWorker);
@@ -93,6 +93,7 @@ export default function MainHeader() {
   const coinStatusSelector = useSelector(selectCoinStatus);
   const countSelector = useSelector(selectCounter);
   const coinAggregatorSelector = useSelector(selectAggregatePrice);
+  const marketsStatusSelector = useSelector(selectMarketsStatus);
   // hooks
   const [coinSymbol, setCoinSymbol] = React.useState("");
   const [coinList, setCoinList] = React.useState([]);
@@ -199,6 +200,8 @@ export default function MainHeader() {
     let startEndHours = {};
     let exchange = "";
     if (Event.charCode === 13 && coinSymbol !== "") {
+      setIsExchanges(true);
+
       coinList.forEach((coin) => {
         if (coin.toLowerCase() === coinSymbol.toLowerCase()) {
           const coinCurrencyPair = coinSymbol.toLowerCase() + "usd";
@@ -311,6 +314,10 @@ export default function MainHeader() {
     clearLists();
   };
 
+  // const handleExchangeClick = () => {
+  //   console.log("button clicked");
+  // };
+
   // this is only called when open is set false
   const handleModalClose = () => setOpenModal(false);
 
@@ -322,11 +329,18 @@ export default function MainHeader() {
 
   const ExchangeButton = (props) => {
     const isExchanges = props.isExchanges;
-    if (isExchanges) {
+    if (isExchanges && marketsStatusSelector === "succeeded") {
       return (
-        <Button variant="contained" endIcon={<ArrowDropDownCircleSharp />}>
-          Choose Exchange
-        </Button>
+        <ExchangeMenu />
+        // <Button
+        //   name="exchange"
+        //   onClick={handleExchangeClick()}
+        //   ref={exchangeButtonRef}
+        //   variant="contained"
+        //   endIcon={<ArrowDropDownCircleSharp />}
+        // >
+        //   Choose Exchange
+        // </Button>
       );
     }
     return null;
