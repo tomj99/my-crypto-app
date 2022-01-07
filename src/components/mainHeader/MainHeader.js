@@ -108,6 +108,7 @@ export default function MainHeader() {
   const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
     React.useState([]);
   const [isExchanges, setIsExchanges] = React.useState(false);
+  const [coin, setCoin] = React.useState("");
   // SECTION useEffects
   // *Without webworker*, tests pass
 
@@ -197,7 +198,7 @@ export default function MainHeader() {
   }
 
   function handleSearchOnEnter(Event) {
-    let startEndHours = {};
+    // let startEndHours = {};
     let exchange = "";
     if (Event.charCode === 13 && coinSymbol !== "") {
       setIsExchanges(true);
@@ -223,28 +224,28 @@ export default function MainHeader() {
             }
           });
           // "Sat Jan 01 2022 16:10:18 GMT-0800 (Pacific Standard Time)"
-          const dateNow = new Date();
-          setCoinText(coin.toUpperCase());
-          startEndHours = unixStartAndEndTimes(dateNow);
-          setChartInputObject({
-            coin: coinCurrencyPair,
-            startTime: startEndHours.startTime,
-            endTime: startEndHours.endTime,
-            period: 3600,
-            exchange: exchange,
-          });
-          startEndHours = unixStartAndEndTimesLastCandle(dateNow);
-          setChartInputObjectLastCandle({
-            coin: coinCurrencyPair,
-            startTime: startEndHours.startTime,
-            endTime: startEndHours.endTime,
-            period: 60,
-            exchange: exchange,
-          });
-          setOpen(false);
-          setAnchorEl(null);
-          setCoinSymbol("");
-          setOpenModal(true);
+          // const dateNow = new Date();
+          // setCoinText(coin.toUpperCase());
+          // startEndHours = unixStartAndEndTimes(dateNow);
+          // setChartInputObject({
+          //   coin: coinCurrencyPair,
+          //   startTime: startEndHours.startTime,
+          //   endTime: startEndHours.endTime,
+          //   period: 3600,
+          //   exchange: exchange,
+          // });
+          // startEndHours = unixStartAndEndTimesLastCandle(dateNow);
+          // setChartInputObjectLastCandle({
+          //   coin: coinCurrencyPair,
+          //   startTime: startEndHours.startTime,
+          //   endTime: startEndHours.endTime,
+          //   period: 60,
+          //   exchange: exchange,
+          // });
+          // setOpen(false);
+          // setAnchorEl(null);
+          // setCoinSymbol("");
+          // setOpenModal(true);
         }
       });
     }
@@ -252,48 +253,48 @@ export default function MainHeader() {
 
   function handleClick(Event) {
     setIsExchanges(true);
-    let startEndHours = {};
-    let exchange = "";
+    // let startEndHours = {};
+    // let exchange = "";
     // need next two lines for test bug, event text is not getting passed in during testing.
-    let coinCurrencyPair = "adatestusd";
-    let coin = "adatest";
+    // let coinCurrencyPair = "adatestusd";
+    setCoin("adatest");
     if (Event.currentTarget.innerText !== undefined) {
-      coin = Event.currentTarget.innerText;
-      coinCurrencyPair = Event.currentTarget.innerText + "usd";
+      setCoin(Event.currentTarget.innerText);
+      // coinCurrencyPair = Event.currentTarget.innerText + "usd";
     }
-    const markets = Object.values(usdPairsSelector);
-    markets.forEach((item) => {
-      if (item.pair === coinCurrencyPair && item.active === true) {
-        dispatch(increment());
-        const coinObj = { exchange: item.exchange, coinPair: coinCurrencyPair };
-        if (item.exchange === "coinbase-pro" || item.exchange === "kraken") {
-          exchange = item.exchange;
-        }
-        dispatch(fetchCoin(coinObj));
-      }
-    });
-    const dateNow = new Date();
-    setCoinText(coin.toUpperCase());
-    startEndHours = unixStartAndEndTimes(dateNow);
-    setChartInputObject({
-      coin: coinCurrencyPair,
-      startTime: startEndHours.startTime,
-      endTime: startEndHours.endTime,
-      period: 3600,
-      exchange: exchange,
-    });
-    startEndHours = unixStartAndEndTimesLastCandle(dateNow);
-    setChartInputObjectLastCandle({
-      coin: coinCurrencyPair,
-      startTime: startEndHours.startTime,
-      endTime: startEndHours.endTime,
-      period: 60,
-      exchange: exchange,
-    });
-    setOpen(false);
-    setAnchorEl(null);
-    setCoinSymbol("");
-    setOpenModal(true);
+    // const markets = Object.values(usdPairsSelector);
+    // markets.forEach((item) => {
+    //   if (item.pair === coinCurrencyPair && item.active === true) {
+    //     dispatch(increment());
+    //     const coinObj = { exchange: item.exchange, coinPair: coinCurrencyPair };
+    //     if (item.exchange === "coinbase-pro" || item.exchange === "kraken") {
+    //       exchange = item.exchange;
+    //     }
+    //     dispatch(fetchCoin(coinObj));
+    //   }
+    // });
+    //   const dateNow = new Date();
+    //   setCoinText(coin.toUpperCase());
+    //   startEndHours = unixStartAndEndTimes(dateNow);
+    //   setChartInputObject({
+    //     coin: coinCurrencyPair,
+    //     startTime: startEndHours.startTime,
+    //     endTime: startEndHours.endTime,
+    //     period: 3600,
+    //     exchange: exchange,
+    //   });
+    //   startEndHours = unixStartAndEndTimesLastCandle(dateNow);
+    //   setChartInputObjectLastCandle({
+    //     coin: coinCurrencyPair,
+    //     startTime: startEndHours.startTime,
+    //     endTime: startEndHours.endTime,
+    //     period: 60,
+    //     exchange: exchange,
+    //   });
+    //   setOpen(false);
+    //   setAnchorEl(null);
+    //   setCoinSymbol("");
+    //   setOpenModal(true);
   }
 
   function handleClickAway() {
@@ -301,25 +302,6 @@ export default function MainHeader() {
     setAnchorEl(null);
     setCoinSymbol("");
   }
-
-  const handleModalClick1 = () => {
-    setIsExchanges(false);
-    setOpenModal(false);
-    clearLists();
-  };
-
-  const handleModalClick2 = () => {
-    setIsExchanges(false);
-    setOpenModal(false);
-    clearLists();
-  };
-
-  // const handleExchangeClick = () => {
-  //   console.log("button clicked");
-  // };
-
-  // this is only called when open is set false
-  const handleModalClose = () => setOpenModal(false);
 
   // SECTION misc functions
   function clearLists() {
@@ -330,18 +312,7 @@ export default function MainHeader() {
   const ExchangeButton = (props) => {
     const isExchanges = props.isExchanges;
     if (isExchanges && marketsStatusSelector === "succeeded") {
-      return (
-        <ExchangeMenu />
-        // <Button
-        //   name="exchange"
-        //   onClick={handleExchangeClick()}
-        //   ref={exchangeButtonRef}
-        //   variant="contained"
-        //   endIcon={<ArrowDropDownCircleSharp />}
-        // >
-        //   Choose Exchange
-        // </Button>
-      );
+      return <ExchangeMenu coin={coin} />;
     }
     return null;
   };
@@ -401,7 +372,7 @@ export default function MainHeader() {
               </ClickAwayListener>
             </Paper>
           </Popper>
-          <Box>
+          {/* <Box>
             <ChartModal
               handleModalClick1={handleModalClick1}
               handleModalClick2={handleModalClick2}
@@ -412,7 +383,7 @@ export default function MainHeader() {
               chartInputObj={chartInputObject}
               chartInputObjLastCandle={chartInputObectLastCandle}
             />
-          </Box>
+          </Box> */}
         </Toolbar>
       </AppBar>
     </Box>
