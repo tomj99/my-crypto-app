@@ -24,6 +24,7 @@ export const selectMarketsData = (state) => state.markets.markets.result;
 export const selectMarketsStatus = (state) => state.markets.status;
 export const selectMarketsError = (state) => state.markets.error;
 export const selectFilteredByUsd = (state) => state.markets.markets;
+export const selectCurrentExchange = (state) => state.markets.markets.exchange;
 
 // counter selector
 export const selectCounter = (state) => state.counter.value;

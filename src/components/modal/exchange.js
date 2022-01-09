@@ -21,7 +21,7 @@ import {
   unixStartAndEndTimes,
   unixStartAndEndTimesLastCandle,
 } from "../timeUtils/timeUtils";
-import { saveExchange } from "../../redux/slices/marketsSlice";
+import { SystemSecurityUpdate } from "@mui/icons-material";
 
 const ExchangeMenu = (props) => {
   const usdPairsSelector = useSelector(selectFilteredByUsd);
@@ -40,31 +40,31 @@ const ExchangeMenu = (props) => {
   const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
     React.useState([]);
 
-  const buildChartApiInputObject = React.useCallback(() => {
-    let startEndHours = {};
-    const dateNow = new Date();
-    startEndHours = unixStartAndEndTimes(dateNow);
-    setChartInputObject({
-      coin: coinCurrencyPair,
-      startTime: startEndHours.startTime,
-      endTime: startEndHours.endTime,
-      period: 3600,
-      exchange: exchangeName,
-    });
-  }, [coinCurrencyPair, exchangeName]);
+  //   const buildChartApiInputObject = React.useCallback(() => {
+  //     let startEndHours = {};
+  //     const dateNow = new Date();
+  //     startEndHours = unixStartAndEndTimes(dateNow);
+  //     setChartInputObject({
+  //       coin: coinCurrencyPair,
+  //       startTime: startEndHours.startTime,
+  //       endTime: startEndHours.endTime,
+  //       period: 3600,
+  //       exchange: exchangeName,
+  //     });
+  //   }, [coinCurrencyPair, exchangeName]);
 
-  const buildChartApiInputObjectLastCandle = React.useCallback(() => {
-    let startEndHours = {};
-    const dateNow = new Date();
-    startEndHours = unixStartAndEndTimesLastCandle(dateNow);
-    setChartInputObjectLastCandle({
-      coin: coinCurrencyPair,
-      startTime: startEndHours.startTime,
-      endTime: startEndHours.endTime,
-      period: 60,
-      exchange: exchangeName,
-    });
-  }, [coinCurrencyPair, exchangeName]);
+  //   const buildChartApiInputObjectLastCandle = React.useCallback(() => {
+  //     let startEndHours = {};
+  //     const dateNow = new Date();
+  //     startEndHours = unixStartAndEndTimesLastCandle(dateNow);
+  //     setChartInputObjectLastCandle({
+  //       coin: coinCurrencyPair,
+  //       startTime: startEndHours.startTime,
+  //       endTime: startEndHours.endTime,
+  //       period: 60,
+  //       exchange: exchangeName,
+  //     });
+  //   }, [coinCurrencyPair, exchangeName]);
 
   const exchangeAutoClick = React.useCallback(() => {
     anchorRef.current.click();
@@ -100,8 +100,7 @@ const ExchangeMenu = (props) => {
         coinPair: props.coin + "usd",
       };
       dispatch(fetchCoin(coinObj));
-      // dispatch(saveExchange(Event.currentTarget.innerText));
-      // setExchangeName();
+      setExchangeName(Event.currentTarget.innerText);
     }
   };
 

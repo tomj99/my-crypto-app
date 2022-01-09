@@ -2,7 +2,11 @@ import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  markets: [],
+  markets: [
+    {
+      currentExchange: "",
+    },
+  ],
   status: "idle",
   error: "none",
 };
@@ -26,6 +30,9 @@ export const marketsSlice = createSlice({
       state.markets = action.payload;
       //Object.assign(state.markets, action.payload);
     },
+    saveExchange: (state, action) => {
+      state.markets.currentExchange = action.payload;
+    },
   },
   extraReducers(builder) {
     builder
@@ -43,5 +50,6 @@ export const marketsSlice = createSlice({
   },
 });
 
-export const { filterByUsd, updateMarketsState } = marketsSlice.actions;
+export const { filterByUsd, updateMarketsState, saveExchange } =
+  marketsSlice.actions;
 export default marketsSlice.reducer;
