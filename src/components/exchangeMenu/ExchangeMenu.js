@@ -99,16 +99,10 @@ const ExchangeMenu = (props) => {
         exchange: Event.currentTarget.innerText,
         coinPair: props.coin + "usd",
       };
-      setExchangeName(Event.currentTarget.innerText);
       dispatch(fetchCoin(coinObj));
+      setExchangeName(Event.currentTarget.innerText);
     }
   };
-
-  // const handleDispatchAndClose = (exchange) => {
-  //   const coinObj = { exchange: exchange, coinPair: props.coin + "usd" };
-  //   // dispatch(fetchCoin(coinObj));
-  //   setOpen(false);
-  // };
 
   const handleExchangeButtonClick = (Event) => {
     setOpen((open) => !open);
@@ -197,6 +191,7 @@ const ExchangeMenu = (props) => {
                       </MenuItem>
                     );
                   }
+                  return null;
                 })}
               </MenuList>
             </ClickAwayListener>
