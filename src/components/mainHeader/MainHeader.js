@@ -137,23 +137,23 @@ export default function MainHeader() {
   //   }
   // }, [coinSymbol, coinsAllStatusSelector]);
 
-  React.useEffect(() => {
-    if (coinStatusSelector === "succeeded") {
-      setPriceList((prevArray) => [...prevArray, coinSelector]);
-      if (coinAggregatorSelector === undefined) {
-        setPrice("aggregating prices...");
-      }
-      if (coinAggregatorSelector !== undefined) {
-        setPrice(coinAggregatorSelector);
-      }
-    }
-  }, [coinSelector, coinAggregatorSelector, coinStatusSelector]);
+  // React.useEffect(() => {
+  //   if (coinStatusSelector === "succeeded") {
+  //     setPriceList((prevArray) => [...prevArray, coinSelector]);
+  //     if (coinAggregatorSelector === undefined) {
+  //       setPrice("aggregating prices...");
+  //     }
+  //     if (coinAggregatorSelector !== undefined) {
+  //       setPrice(coinAggregatorSelector);
+  //     }
+  //   }
+  // }, [coinSelector, coinAggregatorSelector, coinStatusSelector]);
 
   // SECTION actions on rerender
-  if (priceList.length === countSelector && countSelector !== 0) {
-    dispatch(aggregatePrice(aggregateMarketPrices()));
-    clearLists();
-  }
+  // if (priceList.length === countSelector && countSelector !== 0) {
+  //   dispatch(aggregatePrice(aggregateMarketPrices()));
+  //   clearLists();
+  // }
 
   if (marketsSelector !== undefined && usdFilter === false) {
     //if (marketsStatusSelector === "succeeded" && usdFilter === false) {
