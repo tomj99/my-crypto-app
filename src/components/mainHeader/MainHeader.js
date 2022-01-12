@@ -11,31 +11,18 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectCoinsAll,
-  // selectCoinsAllStatus,
   selectMarketsData,
-  // selectMarketsStatus,
-  selectFilteredByUsd,
-  selectCoin,
-  selectCoinStatus,
-  selectCounter,
-  selectAggregatePrice,
   selectMarketsStatus,
+  selectIsExchanges,
 } from "../../redux/selectors";
 import SearchItem from "../searchItem/SearchItem";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Paper from "@mui/material/Paper";
 import Popper from "@mui/material/Popper";
 import List from "@mui/material/List";
-import { increment, countReset } from "../../redux/slices/counterSlice";
-import { aggregatePrice } from "../../redux/slices/simplePriceSlice";
-import { fetchCoin } from "../../redux/slices/simplePriceSlice";
-import { filterByUsd } from "../../redux/slices/marketsSlice";
-import {
-  unixStartAndEndTimes,
-  unixStartAndEndTimesLastCandle,
-} from "../timeUtils/timeUtils";
-import ChartModal from "../modal/ChartModal";
+import { filterByUsd, isExchanges } from "../../redux/slices/marketsSlice";
 import ExchangeMenu from "../exchangeMenu/ExchangeMenu";
+import { coinClear } from "../../redux/slices/simplePriceSlice";
 // import WorkerBuilder from "../../workers/worker-builder";
 // import CoinListWorker from "../../workers/coinList.worker";
 // const instance = new WorkerBuilder(CoinListWorker);
@@ -88,26 +75,15 @@ export default function MainHeader() {
   // selectors
   const coinsAllSelector = useSelector(selectCoinsAll);
   const marketsSelector = useSelector(selectMarketsData);
-  const usdPairsSelector = useSelector(selectFilteredByUsd);
-  const coinSelector = useSelector(selectCoin);
-  const coinStatusSelector = useSelector(selectCoinStatus);
-  const countSelector = useSelector(selectCounter);
-  const coinAggregatorSelector = useSelector(selectAggregatePrice);
   const marketsStatusSelector = useSelector(selectMarketsStatus);
+  const isExchangesSelector = useSelector(selectIsExchanges);
   // hooks
   const [coinSymbol, setCoinSymbol] = React.useState("");
   const [coinList, setCoinList] = React.useState([]);
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [openModal, setOpenModal] = React.useState(false);
-  const [coinText, setCoinText] = React.useState("");
   const [usdFilter, setUsdFilter] = React.useState(false);
-  const [price, setPrice] = React.useState("");
-  const [priceList, setPriceList] = React.useState([]);
-  const [chartInputObject, setChartInputObject] = React.useState([]);
-  const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
-    React.useState([]);
-  const [isExchanges, setIsExchanges] = React.useState(false);
+  // const [isExchanges, setIsExchanges] = React.useState(false);
   const [coin, setCoin] = React.useState("");
   // SECTION useEffects
   // *Without webworker*, tests pass
@@ -137,26 +113,7 @@ export default function MainHeader() {
   //   }
   // }, [coinSymbol, coinsAllStatusSelector]);
 
-  // React.useEffect(() => {
-  //   if (coinStatusSelector === "succeeded") {
-  //     setPriceList((prevArray) => [...prevArray, coinSelector]);
-  //     if (coinAggregatorSelector === undefined) {
-  //       setPrice("aggregating prices...");
-  //     }
-  //     if (coinAggregatorSelector !== undefined) {
-  //       setPrice(coinAggregatorSelector);
-  //     }
-  //   }
-  // }, [coinSelector, coinAggregatorSelector, coinStatusSelector]);
-
-  // SECTION actions on rerender
-  // if (priceList.length === countSelector && countSelector !== 0) {
-  //   dispatch(aggregatePrice(aggregateMarketPrices()));
-  //   clearLists();
-  // }
-
   if (marketsSelector !== undefined && usdFilter === false) {
-    //if (marketsStatusSelector === "succeeded" && usdFilter === false) {
     dispatch(filterByUsd(filterUsd()));
     setUsdFilter(true);
   }
@@ -172,21 +129,6 @@ export default function MainHeader() {
     return filteredByUsdPairs;
   }
 
-  function aggregateMarketPrices() {
-    const length = priceList.length;
-    let totalPrice = 0;
-    let aggregatePrice = 0;
-    priceList.forEach((item) => {
-      totalPrice += item.price;
-    });
-    aggregatePrice = totalPrice / length;
-    if (aggregatePrice >= 1) {
-      aggregatePrice = Math.floor(aggregatePrice * 100000) / 100000;
-    } else
-      aggregatePrice = Math.floor(aggregatePrice * 10000000000) / 10000000000;
-    return aggregatePrice;
-  }
-
   // SECTION handlers
   function handleChange(Event) {
     // const symbol = Event.target.value; // for webworker
@@ -198,103 +140,21 @@ export default function MainHeader() {
   }
 
   function handleSearchOnEnter(Event) {
-    // let startEndHours = {};
-    let exchange = "";
     if (Event.charCode === 13 && coinSymbol !== "") {
-      setIsExchanges(true);
-
-      coinList.forEach((coin) => {
-        if (coin.toLowerCase() === coinSymbol.toLowerCase()) {
-          const coinCurrencyPair = coinSymbol.toLowerCase() + "usd";
-          const markets = Object.values(usdPairsSelector);
-          markets.forEach((item) => {
-            if (item.pair === coinCurrencyPair && item.active === true) {
-              dispatch(increment());
-              const coinObj = {
-                exchange: item.exchange,
-                coinPair: coinCurrencyPair,
-              };
-              if (
-                item.exchange === "coinbase-pro" ||
-                item.exchange === "kraken"
-              ) {
-                exchange = item.exchange;
-              }
-              dispatch(fetchCoin(coinObj));
-            }
-          });
-          // "Sat Jan 01 2022 16:10:18 GMT-0800 (Pacific Standard Time)"
-          // const dateNow = new Date();
-          // setCoinText(coin.toUpperCase());
-          // startEndHours = unixStartAndEndTimes(dateNow);
-          // setChartInputObject({
-          //   coin: coinCurrencyPair,
-          //   startTime: startEndHours.startTime,
-          //   endTime: startEndHours.endTime,
-          //   period: 3600,
-          //   exchange: exchange,
-          // });
-          // startEndHours = unixStartAndEndTimesLastCandle(dateNow);
-          // setChartInputObjectLastCandle({
-          //   coin: coinCurrencyPair,
-          //   startTime: startEndHours.startTime,
-          //   endTime: startEndHours.endTime,
-          //   period: 60,
-          //   exchange: exchange,
-          // });
-          // setOpen(false);
-          // setAnchorEl(null);
-          // setCoinSymbol("");
-          // setOpenModal(true);
-        }
-      });
+      dispatch(isExchanges(true));
+      dispatch(coinClear());
+      // setIsExchanges(true);
+      setCoin(coinSymbol);
     }
   }
 
   function handleClick(Event) {
-    setIsExchanges(true);
-    // let startEndHours = {};
-    // let exchange = "";
-    // need next two lines for test bug, event text is not getting passed in during testing.
-    // let coinCurrencyPair = "adatestusd";
+    dispatch(isExchanges(true));
+    dispatch(coinClear());
     setCoin("adatest");
     if (Event.currentTarget.innerText !== undefined) {
       setCoin(Event.currentTarget.innerText);
-      // coinCurrencyPair = Event.currentTarget.innerText + "usd";
     }
-    // const markets = Object.values(usdPairsSelector);
-    // markets.forEach((item) => {
-    //   if (item.pair === coinCurrencyPair && item.active === true) {
-    //     dispatch(increment());
-    //     const coinObj = { exchange: item.exchange, coinPair: coinCurrencyPair };
-    //     if (item.exchange === "coinbase-pro" || item.exchange === "kraken") {
-    //       exchange = item.exchange;
-    //     }
-    //     dispatch(fetchCoin(coinObj));
-    //   }
-    // });
-    //   const dateNow = new Date();
-    //   setCoinText(coin.toUpperCase());
-    //   startEndHours = unixStartAndEndTimes(dateNow);
-    //   setChartInputObject({
-    //     coin: coinCurrencyPair,
-    //     startTime: startEndHours.startTime,
-    //     endTime: startEndHours.endTime,
-    //     period: 3600,
-    //     exchange: exchange,
-    //   });
-    //   startEndHours = unixStartAndEndTimesLastCandle(dateNow);
-    //   setChartInputObjectLastCandle({
-    //     coin: coinCurrencyPair,
-    //     startTime: startEndHours.startTime,
-    //     endTime: startEndHours.endTime,
-    //     period: 60,
-    //     exchange: exchange,
-    //   });
-    //   setOpen(false);
-    //   setAnchorEl(null);
-    //   setCoinSymbol("");
-    //   setOpenModal(true);
   }
 
   function handleClickAway() {
@@ -304,14 +164,10 @@ export default function MainHeader() {
   }
 
   // SECTION misc functions
-  function clearLists() {
-    dispatch(countReset());
-    setPriceList([]);
-  }
 
-  const ExchangeButton = (props) => {
-    const isExchanges = props.isExchanges;
-    if (isExchanges && marketsStatusSelector === "succeeded") {
+  const ExchangeButton = () => {
+    // const isExchanges = props.isExchanges;
+    if (isExchangesSelector && marketsStatusSelector === "succeeded") {
       return <ExchangeMenu coin={coin} />;
     }
     return null;
@@ -338,8 +194,8 @@ export default function MainHeader() {
           >
             My Crypto App
           </Typography>
-          <ExchangeButton isExchanges={isExchanges} />
-          <Search hidden={isExchanges} data-testid="search-bar">
+          <ExchangeButton />
+          <Search hidden={isExchangesSelector} data-testid="search-bar">
             <SearchIconWrapper aria-label="search-icon">
               <SearchRoundedIcon />
             </SearchIconWrapper>
@@ -372,18 +228,6 @@ export default function MainHeader() {
               </ClickAwayListener>
             </Paper>
           </Popper>
-          {/* <Box>
-            <ChartModal
-              handleModalClick1={handleModalClick1}
-              handleModalClick2={handleModalClick2}
-              openModal={openModal}
-              handleModalClose={handleModalClose}
-              coinText={coinText}
-              price={price}
-              chartInputObj={chartInputObject}
-              chartInputObjLastCandle={chartInputObectLastCandle}
-            />
-          </Box> */}
         </Toolbar>
       </AppBar>
     </Box>

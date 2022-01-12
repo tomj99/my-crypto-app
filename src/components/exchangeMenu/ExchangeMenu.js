@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Box from "@mui/material/Box";
-import Grow from "@mui/material/Grow";
 import Paper from "@mui/material/Paper";
 import Popper from "@mui/material/Popper";
 import MenuItem from "@mui/material/MenuItem";
@@ -14,6 +13,7 @@ import {
   selectFilteredByUsd,
   selectCoinStatus,
   selectCoin,
+  selectCurrentExchange,
 } from "../../redux/selectors";
 import { fetchCoin } from "../../redux/slices/simplePriceSlice";
 import ChartModal from "../modal/ChartModal";
@@ -21,24 +21,26 @@ import {
   unixStartAndEndTimes,
   unixStartAndEndTimesLastCandle,
 } from "../timeUtils/timeUtils";
-import { saveExchange } from "../../redux/slices/marketsSlice";
+import { saveExchange, isExchanges } from "../../redux/slices/marketsSlice";
+import { useNavigate } from "react-router-dom";
 
 const ExchangeMenu = (props) => {
   const usdPairsSelector = useSelector(selectFilteredByUsd);
   const coinStatusSelector = useSelector(selectCoinStatus);
   const coinSelector = useSelector(selectCoin);
-  const dispatch = useDispatch();
+  const currentExchangeSelector = useSelector(selectCurrentExchange);
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const anchorRef = React.useRef("exchange");
   const coinCurrencyPair = props.coin + "usd";
   const markets = Object.values(usdPairsSelector);
   const [openModal, setOpenModal] = React.useState(false);
-  const [exchangeName, setExchangeName] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [chartInputObject, setChartInputObject] = React.useState([]);
   const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
     React.useState([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const buildChartApiInputObject = React.useCallback(() => {
     let startEndHours = {};
@@ -49,9 +51,9 @@ const ExchangeMenu = (props) => {
       startTime: startEndHours.startTime,
       endTime: startEndHours.endTime,
       period: 3600,
-      exchange: exchangeName,
+      exchange: currentExchangeSelector,
     });
-  }, [coinCurrencyPair, exchangeName]);
+  }, [coinCurrencyPair, currentExchangeSelector]);
 
   const buildChartApiInputObjectLastCandle = React.useCallback(() => {
     let startEndHours = {};
@@ -62,9 +64,9 @@ const ExchangeMenu = (props) => {
       startTime: startEndHours.startTime,
       endTime: startEndHours.endTime,
       period: 60,
-      exchange: exchangeName,
+      exchange: currentExchangeSelector,
     });
-  }, [coinCurrencyPair, exchangeName]);
+  }, [coinCurrencyPair, currentExchangeSelector]);
 
   const exchangeAutoClick = React.useCallback(() => {
     anchorRef.current.click();
@@ -78,7 +80,6 @@ const ExchangeMenu = (props) => {
 
   React.useEffect(() => {
     if (coinStatusSelector === "succeeded") {
-      console.log(coinSelector.price);
       setPrice(coinSelector.price);
       buildChartApiInputObject();
       buildChartApiInputObjectLastCandle();
@@ -100,43 +101,48 @@ const ExchangeMenu = (props) => {
         coinPair: props.coin + "usd",
       };
       dispatch(fetchCoin(coinObj));
-      // dispatch(saveExchange(Event.currentTarget.innerText));
-      // setExchangeName();
+      dispatch(saveExchange(Event.currentTarget.innerText));
     }
   };
 
   const handleExchangeButtonClick = (Event) => {
     setOpen((open) => !open);
     setAnchorEl(Event.currentTarget);
-    console.log("button clicked");
   };
 
   const handleModalClick1 = () => {
-    // setIsExchanges(false);
     setOpenModal(false);
-    // clearLists();
+    dispatch(isExchanges(false));
+    navigate("/chart");
   };
 
   const handleModalClick2 = () => {
-    // setIsExchanges(false);
     setOpenModal(false);
-    // clearLists();
+    dispatch(isExchanges(false));
+    navigate("/portfolio");
+  };
+
+  const handleModalClick3 = () => {
+    setOpenModal(false);
+    dispatch(isExchanges(false));
   };
 
   // this is only called when open is set false
   const handleModalClose = () => setOpenModal(false);
 
-  //     setOpen(false);
-  //   };
+  function handleClickAway() {
+    setOpen(false);
+    setAnchorEl(null);
+  }
 
-  //   function handleListKeyDown(event) {
-  //     if (event.key === "Tab") {
-  //       event.preventDefault();
-  //       setOpen(false);
-  //     } else if (event.key === "Escape") {
-  //       setOpen(false);
-  //     }
+  // function handleListKeyDown(event) {
+  //   if (event.key === "Tab") {
+  //     event.preventDefault();
+  //     setOpen(false);
+  //   } else if (event.key === "Escape") {
+  //     setOpen(false);
   //   }
+  // }
 
   // return focus to the button when we transitioned from !open -> open
   //   const prevOpen = React.useRef(open);
@@ -166,8 +172,6 @@ const ExchangeMenu = (props) => {
           anchorEl={anchorEl}
           role={undefined}
           placement="bottom-end"
-          // transition
-          // disablePortal
         >
           {/* {({ TransitionProps, placement }) => (
             <Grow
@@ -178,11 +182,12 @@ const ExchangeMenu = (props) => {
               }}
             > */}
           <Paper>
-            <ClickAwayListener onClickAway={handleExchangePopperClick}>
+            <ClickAwayListener onClickAway={handleClickAway}>
               <MenuList
-                autoFocusItem={open}
+                // autoFocusItem={open}
                 id="composition-menu"
                 aria-labelledby="exchange-button"
+                // onKeyDown={handleListKeyDown}
               >
                 {markets.map((item, index) => {
                   if (item.pair === coinCurrencyPair && item.active === true) {
@@ -205,6 +210,7 @@ const ExchangeMenu = (props) => {
           <ChartModal
             handleModalClick1={handleModalClick1}
             handleModalClick2={handleModalClick2}
+            handleModalClick3={handleModalClick3}
             openModal={openModal}
             handleModalClose={handleModalClose}
             coinText={props.coin.toUpperCase()}

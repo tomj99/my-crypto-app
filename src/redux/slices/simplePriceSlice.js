@@ -1,11 +1,7 @@
 import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 const initialState = {
-  coin: [
-    {
-      aggregatorPrice: 0,
-    },
-  ],
+  coin: [],
   status: "idle",
   error: "none",
 };
@@ -23,8 +19,10 @@ export const simplePriceSlice = createSlice({
   name: "coin",
   initialState,
   reducers: {
-    aggregatePrice: (state, action) => {
-      state.coin.aggregatorPrice = action.payload;
+    coinClear: (state) => {
+      state.coin = [];
+      state.status = "idle";
+      state.error = "none";
     },
   },
   extraReducers(builder) {
@@ -43,5 +41,5 @@ export const simplePriceSlice = createSlice({
   },
 });
 
-export const { aggregatePrice } = simplePriceSlice.actions;
+export const { coinClear } = simplePriceSlice.actions;
 export default simplePriceSlice.reducer;

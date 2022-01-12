@@ -59,6 +59,7 @@ const ChartModal = (props) => {
         />
         <Button onClick={props.handleModalClick1}>Show Full Chart</Button>
         <Button onClick={props.handleModalClick2}>Add to Portfolio</Button>
+        <Button onClick={props.handleModalClick3}>Exit</Button>
       </Box>
     </Modal>
   );
