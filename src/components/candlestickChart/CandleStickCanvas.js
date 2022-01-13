@@ -165,21 +165,37 @@ const CandleStickCanvas = (props) => {
 
   const candleScaling = () => {
     // set up for aligning candle bodies to time/dates on x-axis
-    // this works for the volume as well
     const dateRange = dohlcvData.length;
     const xPixelRange = 380;
     setLeftWall(60);
     setTimePerPixel(xPixelRange / dateRange);
-
+    // sets up candle scaling to highest and lowest price
     const priceRange = highestPrice - lowestPrice;
     const yPixelRange = 200;
     setFloor(220);
     setPricePerPixel(priceRange / yPixelRange);
   };
 
-  const lastCandleRescale = () => {};
+  const lastCandleRescale = () => {
+    let isRescale = false;
+    if (highestLastCandlePrice > highestPrice) {
+      setHighestPrice(highestLastCandlePrice);
+      isRescale = true;
+    }
+    if (lowestLastCandlePrice < lowestPrice) {
+      setLowestPrice(lowestLastCandlePrice);
+      isRescale = true;
+    }
+    if (isRescale) {
+      const priceRange = highestPrice - lowestPrice;
+      const yPixelRange = 200;
+      setFloor(220);
+      setPricePerPixel(priceRange / yPixelRange);
+    }
+  };
 
   const volumeScaling = () => {
+    // sets up volume scaling to highest and lowest volume
     const volumeRange = highestVolume;
     const yPixelRange = 40;
     setVolumeFloor(260);
@@ -187,8 +203,16 @@ const CandleStickCanvas = (props) => {
   };
 
   const lastVolumeRescale = () => {
+    let isRescale = false;
     if (highestLastCandleVolume > highestVolume) {
       setHighestVolume(highestLastCandleVolume);
+      isRescale = true;
+    }
+    if (isRescale) {
+      const volumeRange = highestVolume;
+      const yPixelRange = 40;
+      setVolumeFloor(260);
+      setVolumePerPixel(volumeRange / yPixelRange);
     }
   };
 
@@ -560,10 +584,10 @@ const CandleStickCanvas = (props) => {
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     xAxis(ctx);
     yAxis(ctx);
-    lastCandleRescale(); // not working
-    lastVolumeRescale(); // not working
     candleScaling();
+    lastCandleRescale();
     volumeScaling();
+    lastVolumeRescale(); // tbd if working
     for (let i = 0; i < dohlcvData.length; i++) {
       ohlcCandle(ctx, 11, i);
       ohlcVolume(ctx, 11, i);
