@@ -39,6 +39,8 @@ const ExchangeMenu = (props) => {
   const [chartInputObject, setChartInputObject] = React.useState([]);
   const [chartInputObectLastCandle, setChartInputObjectLastCandle] =
     React.useState([]);
+  const [isButton, setIsButton] = React.useState(true);
+  const [exchange, setExchange] = React.useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -83,8 +85,8 @@ const ExchangeMenu = (props) => {
       setPrice(coinSelector.price);
       buildChartApiInputObject();
       buildChartApiInputObjectLastCandle();
-      setOpen(false);
-      setAnchorEl(null);
+      // setOpen(false);
+      // setAnchorEl(null);
       setOpenModal(true);
     }
   }, [
@@ -95,7 +97,11 @@ const ExchangeMenu = (props) => {
   ]);
 
   const handleExchangePopperClick = (Event) => {
+    setOpen(false);
+    setAnchorEl(null);
     if (Event.currentTarget.innerText !== undefined) {
+      setExchange(Event.currentTarget.innerText);
+      setIsButton(false);
       const coinObj = {
         exchange: Event.currentTarget.innerText,
         coinPair: props.coin + "usd",
@@ -135,6 +141,25 @@ const ExchangeMenu = (props) => {
     setAnchorEl(null);
   }
 
+  const buttonOrText = () => {
+    if (isButton === true) {
+      return (
+        <Button
+          name="exchange"
+          id="exchange-button"
+          onClick={handleExchangeButtonClick}
+          ref={anchorRef}
+          variant="contained"
+          endIcon={<ArrowDropDownCircleSharp />}
+        >
+          Choose Exchange
+        </Button>
+      );
+    } else {
+      return null;
+    }
+  };
+
   // function handleListKeyDown(event) {
   //   if (event.key === "Tab") {
   //     event.preventDefault();
@@ -157,16 +182,7 @@ const ExchangeMenu = (props) => {
   return (
     <Stack direction="row" spacing={2}>
       <div>
-        <Button
-          name="exchange"
-          id="exchange-button"
-          onClick={handleExchangeButtonClick}
-          ref={anchorRef}
-          variant="contained"
-          endIcon={<ArrowDropDownCircleSharp />}
-        >
-          Choose Exchange
-        </Button>
+        {buttonOrText()}
         <Popper
           open={open}
           anchorEl={anchorEl}
@@ -214,7 +230,7 @@ const ExchangeMenu = (props) => {
             openModal={openModal}
             handleModalClose={handleModalClose}
             coinText={props.coin.toUpperCase()}
-            price={price}
+            price={price + "/Exchange: " + exchange.toUpperCase()}
             chartInputObj={chartInputObject}
             chartInputObjLastCandle={chartInputObectLastCandle}
           />
