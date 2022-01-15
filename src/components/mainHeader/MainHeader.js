@@ -143,7 +143,6 @@ export default function MainHeader() {
     if (Event.charCode === 13 && coinSymbol !== "") {
       dispatch(isExchanges(true));
       dispatch(coinClear());
-      // setIsExchanges(true);
       setCoin(coinSymbol);
     }
   }

@@ -85,9 +85,8 @@ const ExchangeMenu = (props) => {
       setPrice(coinSelector.price);
       buildChartApiInputObject();
       buildChartApiInputObjectLastCandle();
-      // setOpen(false);
-      // setAnchorEl(null);
       setOpenModal(true);
+      setInterval(resetDataNextMinute, 60000);
     }
   }, [
     coinStatusSelector,
@@ -95,6 +94,11 @@ const ExchangeMenu = (props) => {
     buildChartApiInputObject,
     buildChartApiInputObjectLastCandle,
   ]);
+
+  function resetDataNextMinute() {
+    buildChartApiInputObject();
+    buildChartApiInputObjectLastCandle();
+  }
 
   const handleExchangePopperClick = (Event) => {
     setOpen(false);

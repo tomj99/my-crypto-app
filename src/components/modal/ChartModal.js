@@ -37,6 +37,7 @@ const ChartModal = (props) => {
     if (props.openModal) {
       dispatch(fetchOhlcData(props.chartInputObj));
       dispatch(fetchOhlcModifiableData(props.chartInputObjLastCandle));
+      // setInterval(retrieveData, 60000);
     }
   }, [
     props.openModal,
@@ -45,24 +46,36 @@ const ChartModal = (props) => {
     props.chartInputObjLastCandle,
   ]);
 
-  return (
-    <Modal hideBackdrop open={props.openModal} onClose={props.handleModalClose}>
-      <Box sx={{ ...style, width: 485 }}>
-        <h3>
-          {props.coinText}: {props.price}
-        </h3>
-        <CandleStickCanvas
-          data={ohlcDataSelector}
-          status={ohlcStatusSelector}
-          datalastcandle={ohlcModifiableDataSelector}
-          statuslastcandle={ohlcModifiableStatusSelector}
-        />
-        <Button onClick={props.handleModalClick1}>Show Full Chart</Button>
-        <Button onClick={props.handleModalClick2}>Add to Portfolio</Button>
-        <Button onClick={props.handleModalClick3}>Exit</Button>
-      </Box>
-    </Modal>
-  );
+  // function retrieveData() {
+  //   dispatch(fetchOhlcData(props.chartInputObj));
+  //   dispatch(fetchOhlcModifiableData(props.chartInputObjLastCandle));
+  // }
+
+  if (
+    ohlcStatusSelector === "succeeded" &&
+    ohlcModifiableStatusSelector === "succeeded"
+  ) {
+    return (
+      <Modal
+        hideBackdrop
+        open={props.openModal}
+        onClose={props.handleModalClose}
+      >
+        <Box sx={{ ...style, width: 485 }}>
+          <h3>
+            {props.coinText}: {props.price}
+          </h3>
+          <CandleStickCanvas
+            data={ohlcDataSelector}
+            datalastcandle={ohlcModifiableDataSelector}
+          />
+          <Button onClick={props.handleModalClick1}>Show Full Chart</Button>
+          <Button onClick={props.handleModalClick2}>Add to Portfolio</Button>
+          <Button onClick={props.handleModalClick3}>Exit</Button>
+        </Box>
+      </Modal>
+    );
+  } else return null;
 };
 
 export default ChartModal;

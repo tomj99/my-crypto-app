@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { convertUnixToDate } from "../timeUtils/timeUtils";
 // props.data format [{date: null, open: null, close: null, high: null, low: null, volume: null}]
 const CandleStickCanvas = (props) => {
-  const { data, status, datalastcandle, statuslastcandle } = props;
+  const { data, datalastcandle, statuslastcandle } = props;
   const canvasRef = useRef(null);
   const [dohlcvData, setDohlcvData] = React.useState([]);
   const [dohlcvLastCandleData, setDohlcvLastCandleData] = React.useState([]);
@@ -21,56 +21,52 @@ const CandleStickCanvas = (props) => {
   const [volumePerPixel, setVolumePerPixel] = React.useState(0);
 
   React.useEffect(() => {
-    if (status === "succeeded") {
-      setDohlcvData([]);
-      const dohlcv = Object.values(data);
-      dohlcv.forEach((obj) => {
-        obj.forEach((element) => {
-          let dohlcvDataObj = {
-            date: null,
-            open: null,
-            close: null,
-            high: null,
-            low: null,
-            volume: null,
-          };
-          dohlcvDataObj.date = element[0];
-          dohlcvDataObj.open = element[1];
-          dohlcvDataObj.high = element[2];
-          dohlcvDataObj.low = element[3];
-          dohlcvDataObj.close = element[4];
-          dohlcvDataObj.volume = element[5];
-          setDohlcvData((dohlcvData) => [...dohlcvData, dohlcvDataObj]);
-        });
+    setDohlcvData([]);
+    const dohlcv = Object.values(data);
+    dohlcv.forEach((obj) => {
+      obj.forEach((element) => {
+        let dohlcvDataObj = {
+          date: null,
+          open: null,
+          close: null,
+          high: null,
+          low: null,
+          volume: null,
+        };
+        dohlcvDataObj.date = element[0];
+        dohlcvDataObj.open = element[1];
+        dohlcvDataObj.high = element[2];
+        dohlcvDataObj.low = element[3];
+        dohlcvDataObj.close = element[4];
+        dohlcvDataObj.volume = element[5];
+        setDohlcvData((dohlcvData) => [...dohlcvData, dohlcvDataObj]);
       });
-    }
-    if (statuslastcandle === "succeeded") {
-      setDohlcvLastCandleData([]);
-      const dohlcvLastCandle = Object.values(datalastcandle);
-      dohlcvLastCandle.forEach((obj) => {
-        obj.forEach((element) => {
-          let dohlcvLastCandleDataObj = {
-            date: null,
-            open: null,
-            close: null,
-            high: null,
-            low: null,
-            volume: null,
-          };
-          dohlcvLastCandleDataObj.date = element[0];
-          dohlcvLastCandleDataObj.open = element[1];
-          dohlcvLastCandleDataObj.high = element[2];
-          dohlcvLastCandleDataObj.low = element[3];
-          dohlcvLastCandleDataObj.close = element[4];
-          dohlcvLastCandleDataObj.volume = element[5];
-          setDohlcvLastCandleData((dohlcvLastCandleData) => [
-            ...dohlcvLastCandleData,
-            dohlcvLastCandleDataObj,
-          ]);
-        });
+    });
+    setDohlcvLastCandleData([]);
+    const dohlcvLastCandle = Object.values(datalastcandle);
+    dohlcvLastCandle.forEach((obj) => {
+      obj.forEach((element) => {
+        let dohlcvLastCandleDataObj = {
+          date: null,
+          open: null,
+          close: null,
+          high: null,
+          low: null,
+          volume: null,
+        };
+        dohlcvLastCandleDataObj.date = element[0];
+        dohlcvLastCandleDataObj.open = element[1];
+        dohlcvLastCandleDataObj.high = element[2];
+        dohlcvLastCandleDataObj.low = element[3];
+        dohlcvLastCandleDataObj.close = element[4];
+        dohlcvLastCandleDataObj.volume = element[5];
+        setDohlcvLastCandleData((dohlcvLastCandleData) => [
+          ...dohlcvLastCandleData,
+          dohlcvLastCandleDataObj,
+        ]);
       });
-    }
-  }, [data, datalastcandle, status, statuslastcandle]);
+    });
+  }, [data, datalastcandle]);
 
   React.useEffect(() => {
     if (dohlcvData.length > 0 && dohlcvLastCandleData.length > 0) {
