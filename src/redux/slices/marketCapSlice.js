@@ -1,7 +1,7 @@
 // redux reducer is similar to the reducer setup in the context api
 import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
+import { coinGecko } from "../../api/axiosConfig";
 const initialState = {
   coinsMCap: [],
   status: "idle",
@@ -11,8 +11,8 @@ const initialState = {
 export const fetchCoinsByMarketCap = createAsyncThunk(
   "coinsByMarketCap/fetchCoinsByMarketCap",
   async () => {
-    const res = await axios.get(
-      `https://api.coingecko.com/api/v3/coins/markets/?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false`
+    const res = await coinGecko.get(
+      `/coins/markets/?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false`
     );
     return res.data;
   }

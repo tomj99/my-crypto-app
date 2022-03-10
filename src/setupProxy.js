@@ -1,16 +1,17 @@
+import { cryptoWatch } from "../../api/axiosConfig";
 const { createProxyMiddleware } = require("http-proxy-middleware");
 module.exports = function (app) {
   app.use(
     "/assets",
     createProxyMiddleware({
-      target: "https://api.cryptowat.ch",
+      target: cryptoWatch,
       changeOrigin: true,
     })
   );
   app.use(
     "/markets",
     createProxyMiddleware({
-      target: "https://api.cryptowat.ch",
+      target: cryptoWatch,
       changeOrigin: true,
     })
   );
