@@ -27,8 +27,8 @@ const CoinList = () => {
       <div>
         {coinsMCapSelector.map((coinsMCap) => (
           <h4 key={coinsMCap.id}>
-            #{coinNumber++}, Coin: {coinsMCap.name}, Price:{" "}
-            {coinsMCap.current_price}
+            #{coinNumber++}, Coin: {coinsMCap.name}, Symbol: {coinsMCap.symbol}
+            <img src={coinsMCap.image} /> Price: {coinsMCap.current_price}
           </h4>
         ))}
       </div>
