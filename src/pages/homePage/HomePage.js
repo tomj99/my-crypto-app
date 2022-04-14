@@ -6,7 +6,7 @@ const HomePage = () => {
   return (
     <Box>
       <MainHeader />
-      <h1>Coins - Top 50 by Volume</h1>
+
       <CoinList />
     </Box>
   );

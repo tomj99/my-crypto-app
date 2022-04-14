@@ -6,6 +6,7 @@ import {
   selectCoinsMCapStatus,
   selectCoinsMCapError,
 } from "../../redux/selectors";
+import Carousel from "react-material-ui-carousel";
 
 const CoinList = () => {
   const coinsMCapSelector = useSelector(selectCoinsMCap);
@@ -24,14 +25,14 @@ const CoinList = () => {
     );
   } else if (coinsMCapStatusSelector === "succeeded") {
     return (
-      <div>
+      <Carousel>
         {coinsMCapSelector.map((coinsMCap) => (
           <h4 key={coinsMCap.id}>
             #{coinNumber++}, Coin: {coinsMCap.name}, Symbol: {coinsMCap.symbol}
             <img src={coinsMCap.image} /> Price: {coinsMCap.current_price}
           </h4>
         ))}
-      </div>
+      </Carousel>
     );
   } else if (coinsMCapStatusSelector === "failed") {
     return (
